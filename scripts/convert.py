@@ -185,12 +185,20 @@ def conv_feedback(wb, year, month):
 
 def conv_schedule(wb):
     out = []
-    for ws in wb.worksheets:
-        if "스케" not in ws.title: continue
+    sheets = [ws for ws in wb.worksheets if "스케" in ws.title]
+    if not sheets: sheets = [ws for ws in wb.worksheets if "대상 점포" in ws.title]   # 스케줄 탭이 없는 달(2025-05)은 대상 점포 리스트에 팀·날짜가 있다
+    for ws in sheets:
         col, h = header_map(ws, SCHED, ["팀"], max_scan=3)
         if not col or "일자" not in col: continue
+        prev_team, prev_date = None, None   # 팀·날짜가 병합 셀이라 아래 줄이 빈 경우(2025-04 등) 바로 위 값을 이어받는다
         for r in rows_of(ws, col, h):
+            raw0 = [s(x) for x in r["_raw"]]
+            is_store = any(re.match(r"^KA_[\dA-Z]", x) for x in raw0) or s(r.get("점포명"))
+            if s(r.get("팀")): prev_team = r.get("팀")
+            elif is_store: r["팀"] = prev_team
             d = kdate(r.get("일자"))
+            if d: prev_date = d
+            elif is_store and prev_date: d = prev_date
             if not d: continue
             # 머리글과 자료가 어긋난 달(2025-09 등): 점포 코드(KA_…) 위치를 기준으로 열을 다시 잡는다
             raw = [s(x) for x in r["_raw"]]
