@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ploom Mobile Booth Official</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600&family=Noto+Serif+KR:wght@400&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<link rel="stylesheet" href="style.css?v=1">
+<style>
+.pl .fb-week{margin-bottom:var(--cds-gap-md)}
+.pl .fb-week h3{margin-bottom:6px}
+.pl .fb-item{display:grid;grid-template-columns:150px 1fr;gap:8px 14px;padding:8px 0;border-top:1px solid var(--color-border-line);font-size:13px}
+.pl .fb-item b{font-weight:500;color:var(--color-fg-muted)}
+.pl .note{font-size:12px;color:var(--color-fg-muted);margin:4px 0 0}
+.pl .hero-top a{color:inherit}
+.pl .foot{margin-top:var(--cds-gap-xl);font-size:12px;color:var(--color-fg-muted);text-align:center}
+</style>
+</head>
+<body>
+
+<div class="app">
+<aside class="side"><div class="brand"><div class="logo">P</div><div><b>Ploom Mobile Booth</b><span>Official</span></div></div>
+  <nav class="tabs" id="tabs">
+    <a href="#overview" data-panel="p-overview" data-title="한눈에 보기" title="한눈에 보기"><svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/></svg><span>한눈에 보기</span></a>
+    <a href="#trend" data-panel="p-trend" data-title="월별·일별" title="월별·일별"><svg viewBox="0 0 24 24"><path d="M4 19V5"/><path d="M4 19h16"/><path d="M8 15l4-5 3 3 5-7"/></svg><span>월별·일별</span></a>
+    <a href="#stores" data-panel="p-stores" data-title="점포" title="점포"><svg viewBox="0 0 24 24"><path d="M3 21h18M5 21V9l7-5 7 5v12"/><path d="M10 21v-6h4v6"/></svg><span>점포</span></a>
+    <a href="#region" data-panel="p-region" data-title="지역" title="지역"><svg viewBox="0 0 24 24"><path d="M12 21s-7-5.5-7-11a7 7 0 0 1 14 0c0 5.5-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg><span>지역</span></a>
+    <a href="#mix" data-panel="p-mix" data-title="상품·고객" title="상품·고객"><svg viewBox="0 0 24 24"><path d="M6 7h12l1 13H5z"/><path d="M9 7V5a3 3 0 0 1 6 0v2"/></svg><span>상품·고객</span></a>
+    <a href="#cvs" data-panel="p-cvs" data-title="CVS 차용" title="CVS 차용"><svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V4h8v3M3 12h18"/></svg><span>CVS 차용</span></a>
+    <a href="#feedback" data-panel="p-feedback" data-title="소비자 피드백" title="소비자 피드백"><svg viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/></svg><span>소비자 피드백</span></a>
+    <a href="#compare" data-panel="p-compare" data-title="작년 비교" title="작년 비교"><svg viewBox="0 0 24 24"><path d="M4 19V9"/><path d="M10 19V5"/><path d="M16 19v-8"/><path d="M22 19V3"/><path d="M2 19h21"/></svg><span>작년 비교</span></a>
+  </nav>
+  <div class="side-foot">자료 기준<br><span id="updated">—</span></div>
+</aside>
+<main class="pl" id="top">
+  <div class="head"><h1 id="page-title">한눈에 보기</h1><div class="badge" id="badge">보고용 데일리 리포트 기준</div></div>
+  <div class="xbar" id="xbar">
+    <label>연도 <select id="f-year"></select></label>
+    <label>월 <select id="f-month"><option value="">전체</option></select></label>
+    <label>브랜드 <select id="f-brand"><option value="">전체</option></select></label>
+    <label>구분 <select id="f-kind"><option value="">전체</option></select></label>
+    <button type="button" id="f-reset">초기화</button>
+    <span class="xf-chips" id="chips"></span>
+  </div>
+
+  <!-- 한눈에 보기 -->
+  <div class="panel" id="p-overview">
+    <section class="ov">
+      <div class="hero"><div class="hero-top"><b id="ov-title">누적</b><span id="ov-sub"></span></div>
+        <div class="hero-stats">
+          <div><div class="k">판매</div><div class="v"><span data-draw="num" data-source="ov" data-field="판매" data-row="0">—</span><span class="u">대</span></div></div>
+          <div><div class="k">방문자</div><div class="v"><span data-draw="num" data-source="ov" data-field="방문자" data-row="0">—</span><span class="u">명</span></div></div>
+          <div><div class="k">방문자 대비 판매</div><div class="v"><span data-draw="num" data-source="ov" data-field="전환율" data-row="0" data-fmt=".1f">—</span><span class="u">%</span></div></div>
+          <div><div class="k">하루 평균 판매</div><div class="v"><span data-draw="num" data-source="ov" data-field="일평균" data-row="0" data-fmt=".1f">—</span><span class="u">대</span></div></div>
+        </div></div>
+      <div class="kpis">
+        <div class="kpi"><div class="k">영업일</div><div class="v"><span data-draw="num" data-source="ov" data-field="일수" data-row="0">—</span><span class="u">일</span></div><div class="s">진행 점포·일 <span data-draw="num" data-source="ov" data-field="점포일" data-row="0">—</span>건</div><div class="ic p"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></div></div>
+        <div class="kpi"><div class="k">점포·일당 판매</div><div class="v"><span data-draw="num" data-source="ov" data-field="점포일당" data-row="0" data-fmt=".2f">—</span><span class="u">대</span></div><div class="s">미판매 점포·일 <span data-draw="num" data-source="ov" data-field="미판매율" data-row="0" data-fmt=".1f">—</span>%</div><div class="ic o"><svg viewBox="0 0 24 24"><path d="M3 21h18M5 21V9l7-5 7 5v12"/><path d="M10 21v-6h4v6"/></svg></div></div>
+        <div class="kpi"><div class="k">판매 점포 수</div><div class="v"><span data-draw="num" data-source="ov" data-field="판매점포" data-row="0">—</span><span class="u">곳</span></div><div class="s">진행 점포 <span data-draw="num" data-source="ov" data-field="진행점포" data-row="0">—</span>곳</div><div class="ic g"><svg viewBox="0 0 24 24"><path d="M12 21s-7-5.5-7-11a7 7 0 0 1 14 0c0 5.5-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg></div></div>
+        <div class="kpi"><div class="k">회원가입 완료율</div><div class="v"><span data-draw="num" data-source="ov" data-field="회원가입률" data-row="0" data-fmt=".1f">—</span><span class="u">%</span></div><div class="s">카카오 채널 추가 <span data-draw="num" data-source="ov" data-field="카카오율" data-row="0" data-fmt=".1f">—</span>%</div><div class="ic g"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M3 20a6 6 0 0 1 12 0"/><circle cx="17" cy="9" r="2.5"/><path d="M15.5 14.5A5 5 0 0 1 21 19"/></svg></div></div>
+        <div class="kpi"><div class="k">기프트카드 제공</div><div class="v"><span data-draw="num" data-source="ov" data-field="기프트카드" data-row="0">—</span><span class="u">장</span></div><div class="s">판매 1대당 <span data-draw="num" data-source="ov" data-field="기프트카드대당" data-row="0" data-fmt=".2f">—</span>장</div><div class="ic r"><svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="12" rx="2"/><path d="M3 12h18M12 8v12M12 8c-2-4-6-3-5 0M12 8c2-4 6-3 5 0"/></svg></div></div>
+      </div>
+      <div class="grid3" style="margin-bottom:var(--cds-gap-md)">
+        <div class="card"><h3>판매 경로 비중</h3><div class="donut" data-draw="donut" data-source="ov_route" data-label="경로" data-value="판매"></div></div>
+        <div class="card"><h3>브랜드 비중</h3><div class="donut" data-draw="donut" data-source="ov_brand" data-label="브랜드" data-value="판매"></div></div>
+        <div class="card"><h3>디바이스 색상 비중</h3><div class="donut" data-draw="donut" data-source="ov_color" data-label="색상" data-value="판매"></div></div>
+      </div>
+      <div class="grid3">
+        <div class="card"><h3 id="ov-month-title">월별 판매 (대)</h3><div class="chart" data-draw="vbar" data-source="m_month" data-x="월" data-y="판매"></div></div>
+        <div class="card"><h3 id="ov-daily-title">일별 판매 (대)</h3><div class="chart" data-draw="line" data-source="ov_daily" data-x="일자" data-y="판매" data-xfmt="date"></div></div>
+        <div class="card"><h3>월별 방문자 대비 판매 (%)</h3><div class="chart" data-draw="line" data-source="m_month" data-x="월" data-y="전환율" data-fmt=".1f"></div></div>
+        <div class="card"><h3>시간대별 판매 (대)</h3><div class="chart" data-draw="vbar" data-source="ov_hour" data-x="시간" data-y="판매" data-xsuffix="시"></div></div>
+        <div class="card"><h3>요일별 하루 평균 판매 (대)</h3><div class="chart" data-draw="vbar" data-source="ov_wday" data-x="요일" data-y="일평균" data-fmt=".0f"></div></div>
+        <div class="card"><h3>점포 구분별 점포·일당 판매 (대)</h3><div class="chart" data-draw="hbar" data-source="ov_kind" data-label="구분" data-value="점포일당" data-fmt=".2f" data-sub="점포일" data-subunit="건"></div></div>
+      </div>
+    </section>
+  </div>
+
+  <!-- 월별·일별 -->
+  <div class="panel" id="p-trend" hidden>
+    <div class="card"><h3>월별 요약</h3>
+      <div class="tw"><table data-source="m_month"><thead><tr><th data-field="월">월</th><th class="n" data-field="판매">판매</th><th class="n" data-field="방문자">방문자</th><th class="n" data-field="전환율">전환 %</th><th class="n" data-field="일수">영업일</th><th class="n" data-field="일평균">일평균</th><th class="n" data-field="점포일">진행 점포·일</th><th class="n" data-field="점포일당">점포·일당</th><th class="n" data-field="미판매율">미판매 %</th><th class="n" data-field="회원가입률">회원가입 %</th><th class="n" data-field="카카오율">카카오 %</th><th class="n" data-field="기프트카드">기프트카드</th></tr></thead>
+      <tbody data-draw="tbl" data-cols="월,판매,방문자,전환율,일수,일평균,점포일,점포일당,미판매율,회원가입률,카카오율,기프트카드" data-fmts=",,,.1f,,.1f,,.2f,.1f,.1f,.1f,"></tbody></table></div>
+      <p class="note">방문자·기프트카드는 데일리 리포트 탭, 나머지는 판매 데이터·진행 점포 탭 기준. 머리글을 누르면 정렬됩니다.</p></div>
+    <div class="grid2" style="margin-top:var(--cds-gap-md)">
+      <div class="card"><h3>주별 판매 (대)</h3><div class="chart" data-draw="line" data-source="m_week" data-x="주" data-y="판매" data-xfmt="date"></div><p class="note">월요일 시작 주.</p></div>
+      <div class="card"><h3>주별 점포·일당 판매 (대)</h3><div class="chart" data-draw="line" data-source="m_week" data-x="주" data-y="점포일당" data-xfmt="date" data-fmt=".2f"></div></div>
+    </div>
+    <div class="card" style="margin-top:var(--cds-gap-md)"><h3>요일 × 시간대 판매 (하루 평균, 대)</h3><div data-draw="heat" data-source="m_heat" data-row="요일" data-col="시간" data-value="일평균"></div></div>
+    <div class="card" style="margin-top:var(--cds-gap-md)"><h3>일별 요약</h3>
+      <div class="tw"><table data-source="m_daily"><thead><tr><th data-field="일자">일자</th><th data-field="요일">요일</th><th class="n" data-field="판매">판매</th><th class="n" data-field="방문자">방문자</th><th class="n" data-field="전환율">전환 %</th><th class="n" data-field="점포일">진행 점포</th><th class="n" data-field="점포일당">점포당</th><th class="n" data-field="미판매">미판매 점포</th><th class="n" data-field="회원가입">회원가입</th><th class="n" data-field="카카오">카카오</th><th class="n" data-field="기프트카드">기프트카드</th></tr></thead>
+      <tbody data-draw="tbl" data-cols="일자,요일,판매,방문자,전환율,점포일,점포일당,미판매,회원가입,카카오,기프트카드" data-fmts=",,,,.1f,,.2f,,,,"></tbody></table></div></div>
+  </div>
+
+  <!-- 점포 -->
+  <div class="panel" id="p-stores" hidden>
+    <div class="grid2">
+      <div class="card"><h3>브랜드 × 구분, 점포·일당 판매 (대)</h3><div class="chart" data-draw="hbar" data-source="s_brand_kind" data-label="브랜드" data-label2="구분" data-value="점포일당" data-fmt=".2f" data-sub="점포일" data-subunit="건"></div></div>
+      <div class="card"><h3>브랜드별 요약</h3>
+        <div class="tw"><table data-source="s_brand"><thead><tr><th data-field="브랜드">브랜드</th><th class="n" data-field="판매">판매</th><th class="n" data-field="점포수">점포 수</th><th class="n" data-field="점포일">점포·일</th><th class="n" data-field="점포일당">점포·일당</th><th class="n" data-field="미판매율">미판매 %</th></tr></thead>
+        <tbody data-draw="tbl" data-cols="브랜드,판매,점포수,점포일,점포일당,미판매율" data-fmts=",,,,.2f,.1f"></tbody></table></div></div>
+      <div class="card"><h3>운영 시간대별 (종일·오전·오후)</h3>
+        <div class="tw"><table data-source="s_slot"><thead><tr><th data-field="시간대">시간대</th><th class="n" data-field="점포일">점포·일</th><th class="n" data-field="판매">판매</th><th class="n" data-field="점포일당">점포·일당</th><th class="n" data-field="미판매율">미판매 %</th></tr></thead>
+        <tbody data-draw="tbl" data-cols="시간대,점포일,판매,점포일당,미판매율" data-fmts=",,,.2f,.1f"></tbody></table></div></div>
+      <div class="card"><h3>신규 · 기존 점포</h3>
+        <div class="tw"><table data-source="s_new"><thead><tr><th data-field="구분">구분</th><th class="n" data-field="점포일">점포·일</th><th class="n" data-field="판매">판매</th><th class="n" data-field="점포일당">점포·일당</th><th class="n" data-field="미판매율">미판매 %</th></tr></thead>
+        <tbody data-draw="tbl" data-cols="구분,점포일,판매,점포일당,미판매율" data-fmts=",,,.2f,.1f"></tbody></table></div><p class="note">스케줄 탭의 기존·신규 구분을 날짜·점포 코드로 맞춘 것.</p></div>
+      <div class="card"><h3>같은 점포 방문 차수별 점포·일당 판매 (대)</h3><div class="chart" data-draw="vbar" data-source="s_visit" data-x="차수" data-y="점포일당" data-fmt=".2f" data-xsuffix="회차" data-sub="점포일"></div></div>
+      <div class="card"><h3>점포·일 판매 분포</h3><div class="chart" data-draw="hbar" data-source="s_dist" data-label="구간" data-value="점포일" data-sub="비중" data-subfmt=".1f" data-subunit="%"></div></div>
+    </div>
+    <div class="card" style="margin-top:var(--cds-gap-md)"><h3>점포별 성과</h3>
+      <div class="toolbar"><input type="search" id="store-q" placeholder="점포명, 브랜드, 지역, 코드로 찾기" style="max-width:360px"><span class="muted" id="store-count"></span></div>
+      <div class="tw"><table data-source="s_stores"><thead><tr><th data-field="점포명">점포</th><th data-field="브랜드">브랜드</th><th data-field="구분">구분</th><th data-field="구">지역</th><th class="n" data-field="판매">판매</th><th class="n" data-field="진행일">진행일</th><th class="n" data-field="일당">일당</th><th class="n" data-field="미판매일">미판매일</th><th data-field="첫진행">첫 진행</th><th data-field="마지막진행">마지막 진행</th></tr></thead>
+      <tbody data-draw="tbl" data-cols="점포명,브랜드,구분,구,판매,진행일,일당,미판매일,첫진행,마지막진행" data-fmts=",,,,,,.2f,,,"></tbody></table></div>
+      <p class="note">진행 점포 탭 기준. 처음에는 판매 순 60곳, 검색하면 전체에서 찾습니다.</p></div>
+  </div>
+
+  <!-- 지역 -->
+  <div class="panel" id="p-region" hidden>
+    <div class="grid2">
+      <div class="card"><h3>시도 비중 (판매)</h3><div class="donut" data-draw="donut" data-source="r_sido" data-label="시도" data-value="판매"></div><p class="note">스케줄 탭 주소 기준. 스케줄에 없는 점포는 "미상".</p></div>
+      <div class="card"><h3>권역별 판매 (대)</h3><div class="chart" data-draw="hbar" data-source="r_zone" data-label="권역" data-value="판매" data-sub="점포일" data-subunit="건"></div><p class="note">스케줄 탭에 권역 열이 있는 달만.</p></div>
+    </div>
+    <div class="card" style="margin-top:var(--cds-gap-md)"><h3>구별 성과</h3>
+      <div class="tw"><table data-source="r_gu"><thead><tr><th data-field="시도">시도</th><th data-field="구">구</th><th class="n" data-field="점포수">점포 수</th><th class="n" data-field="점포일">점포·일</th><th class="n" data-field="판매">판매</th><th class="n" data-field="점포일당">점포·일당</th><th class="n" data-field="미판매율">미판매 %</th></tr></thead>
+      <tbody data-draw="tbl" data-cols="시도,구,점포수,점포일,판매,점포일당,미판매율" data-fmts=",,,,,.2f,.1f"></tbody></table></div></div>
+    <div class="card" style="margin-top:var(--cds-gap-md)"><h3>월별 × 시도 판매 (대)</h3>
+      <div class="legend" data-source="r_month_sido"><span><i data-c="0"></i>서울</span><span><i data-c="1"></i>경기</span><span><i data-c="2"></i>인천</span><span><i data-c="3"></i>기타·미상</span></div>
+      <div class="chart" data-draw="vbar" data-source="r_month_sido" data-x="월" data-y="서울,경기,인천,기타" data-total="판매"></div></div>
+  </div>
+
+  <!-- 상품·고객 -->
+  <div class="panel" id="p-mix" hidden>
+    <div class="grid2">
+      <div class="card"><h3>디바이스 색상 (대)</h3><div class="chart" data-draw="hbar" data-source="x_color" data-label="색상" data-value="판매" data-sub="비중" data-subfmt=".1f" data-subunit="%"></div></div>
+      <div class="card"><h3>판매 경로 (대)</h3><div class="chart" data-draw="hbar" data-source="x_route" data-label="경로" data-value="판매" data-sub="비중" data-subfmt=".1f" data-subunit="%"></div></div>
+      <div class="card"><h3>월별 색상 비중 (%)</h3>
+        <div class="legend" data-source="x_color_month" id="x-color-legend"></div>
+        <div class="chart" data-draw="line" data-source="x_color_month" data-x="월" data-y="비중" data-series="색상" data-fmt=".1f"></div></div>
+      <div class="card"><h3>월별 전환 지표 (%)</h3>
+        <div class="legend" data-source="x_conv"><span><i data-c="0"></i>회원가입 완료율</span><span><i data-c="1"></i>카카오 채널 추가율</span><span><i data-c="2"></i>방문자 대비 판매</span></div>
+        <div class="chart" data-draw="line" data-source="x_conv" data-x="월" data-y="값" data-series="지표" data-order="회원가입 완료율,카카오 채널 추가율,방문자 대비 판매" data-fmt=".1f"></div></div>
+      <div class="card"><h3>월별 기프트카드 제공 (장)</h3><div class="chart" data-draw="vbar" data-source="m_month" data-x="월" data-y="기프트카드"></div></div>
+      <div class="card"><h3>월별 복수 구매 (건)</h3><div class="chart" data-draw="vbar" data-source="m_month" data-x="월" data-y="복수구매"></div><p class="note">데일리 리포트에 복수 구매 열이 있는 달만.</p></div>
+    </div>
+  </div>
+
+  <!-- CVS 차용 -->
+  <div class="panel" id="p-cvs" hidden>
+    <div class="kpis">
+      <div class="kpi"><div class="k">출고 수량</div><div class="v"><span data-draw="num" data-source="c_sum" data-field="출고" data-row="0">—</span><span class="u">대</span></div><div class="s">차용 건수 <span data-draw="num" data-source="c_sum" data-field="건수" data-row="0">—</span>건</div><div class="ic p"><svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V4h8v3"/></svg></div></div>
+      <div class="kpi"><div class="k">반납 수량</div><div class="v"><span data-draw="num" data-source="c_sum" data-field="반납" data-row="0">—</span><span class="u">대</span></div><div class="s">미반납 <span data-draw="num" data-source="c_sum" data-field="미반납" data-row="0">—</span>대</div><div class="ic o"><svg viewBox="0 0 24 24"><path d="M4 17l5-6 4 4 7-8"/><path d="M16 7h4v4"/></svg></div></div>
+      <div class="kpi"><div class="k">차용 점포 수</div><div class="v"><span data-draw="num" data-source="c_sum" data-field="점포수" data-row="0">—</span><span class="u">곳</span></div><div class="ic g"><svg viewBox="0 0 24 24"><path d="M3 21h18M5 21V9l7-5 7 5v12"/><path d="M10 21v-6h4v6"/></svg></div></div>
+    </div>
+    <div class="grid2">
+      <div class="card"><h3>월별 출고·반납 (대)</h3><div class="legend" data-source="c_month"><span><i data-c="0"></i>출고</span><span><i data-c="1"></i>반납</span></div><div class="chart" data-draw="vbar" data-source="c_month" data-x="월" data-y="출고,반납" data-grouped="1"></div></div>
+      <div class="card"><h3>브랜드별 출고 (대)</h3><div class="chart" data-draw="hbar" data-source="c_brand" data-label="브랜드" data-value="출고" data-sub="반납" data-subunit="대 반납"></div></div>
+    </div>
+    <div class="card" style="margin-top:var(--cds-gap-md)"><h3>차용 내역</h3>
+      <div class="tw"><table data-source="c_rows"><thead><tr><th data-field="일자">일자</th><th data-field="점포명">점포</th><th data-field="브랜드">브랜드</th><th class="n" data-field="출고">출고</th><th class="n" data-field="반납">반납</th><th data-field="반납일">반납일</th><th data-field="상태">상태</th></tr></thead>
+      <tbody data-draw="tbl" data-cols="일자,점포명,브랜드,출고,반납,반납일,상태" data-fmts=",,,,,,"></tbody></table></div></div>
+  </div>
+
+  <!-- 소비자 피드백 -->
+  <div class="panel" id="p-feedback" hidden>
+    <p class="note" style="margin-bottom:var(--cds-gap-md)">보고용 리포트의 소비자 피드백 탭을 주차별로 그대로 옮긴 것입니다. 연도·월 필터를 따릅니다.</p>
+    <div id="fb-list"></div>
+  </div>
+
+  <!-- 작년 비교 -->
+  <div class="panel" id="p-compare" hidden>
+    <p class="note" style="margin-bottom:var(--cds-gap-md)">올해와 작년의 같은 달끼리 비교합니다. 월·브랜드·구분 필터를 따르고 연도 필터는 무시합니다. 작년은 2025년 1~3월·8월 자료가 없습니다. <span id="cmp-range"></span></p>
+    <div class="kpis">
+      <div class="kpi"><div class="k">올해 판매</div><div class="v"><span data-draw="num" data-source="k_kpi" data-field="올해판매" data-row="0">—</span><span class="u">대</span></div><div class="s">작년 <span data-draw="num" data-source="k_kpi" data-field="작년판매" data-row="0">—</span>대 · <span data-draw="num" data-source="k_kpi" data-field="판매증감" data-row="0" data-fmt="+.1f">—</span>%</div><div class="ic o"><svg viewBox="0 0 24 24"><path d="M4 17l5-6 4 4 7-8"/><path d="M16 7h4v4"/></svg></div></div>
+      <div class="kpi"><div class="k">하루 평균 판매</div><div class="v"><span data-draw="num" data-source="k_kpi" data-field="올해일평균" data-row="0" data-fmt=".1f">—</span><span class="u">대</span></div><div class="s">작년 <span data-draw="num" data-source="k_kpi" data-field="작년일평균" data-row="0" data-fmt=".1f">—</span>대</div><div class="ic p"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div></div>
+      <div class="kpi"><div class="k">점포·일당 판매</div><div class="v"><span data-draw="num" data-source="k_kpi" data-field="올해점포일당" data-row="0" data-fmt=".2f">—</span><span class="u">대</span></div><div class="s">작년 <span data-draw="num" data-source="k_kpi" data-field="작년점포일당" data-row="0" data-fmt=".2f">—</span>대</div><div class="ic g"><svg viewBox="0 0 24 24"><path d="M3 21h18M5 21V9l7-5 7 5v12"/><path d="M10 21v-6h4v6"/></svg></div></div>
+      <div class="kpi"><div class="k">방문자 대비 판매</div><div class="v"><span data-draw="num" data-source="k_kpi" data-field="올해전환율" data-row="0" data-fmt=".1f">—</span><span class="u">%</span></div><div class="s">작년 <span data-draw="num" data-source="k_kpi" data-field="작년전환율" data-row="0" data-fmt=".1f">—</span>%</div><div class="ic r"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M3 20a6 6 0 0 1 12 0"/></svg></div></div>
+    </div>
+    <div class="grid2">
+      <div class="card"><h3>월별 판매 (대)</h3><div class="legend" data-source="k_line"><span><i data-c="0"></i>올해</span><span><i data-c="1"></i>작년</span></div><div class="chart" data-draw="line" data-source="k_line" data-x="월" data-y="값" data-series="연도" data-order="올해,작년"></div></div>
+      <div class="card"><h3>월별 점포·일당 판매 (대)</h3><div class="legend" data-source="k_line2"><span><i data-c="0"></i>올해</span><span><i data-c="1"></i>작년</span></div><div class="chart" data-draw="line" data-source="k_line2" data-x="월" data-y="값" data-series="연도" data-order="올해,작년" data-fmt=".2f"></div></div>
+    </div>
+    <div class="card" style="margin-top:var(--cds-gap-md)"><h3>월별 비교</h3>
+      <div class="tw"><table data-source="k_month"><thead><tr><th data-field="월">월</th><th class="n" data-field="올해판매">올해 판매</th><th class="n" data-field="작년판매">작년 판매</th><th class="n" data-field="증감">증감 %</th><th class="n" data-field="올해일수">올해 영업일</th><th class="n" data-field="작년일수">작년 영업일</th><th class="n" data-field="올해일평균">올해 일평균</th><th class="n" data-field="작년일평균">작년 일평균</th><th class="n" data-field="올해점포일당">올해 점포·일당</th><th class="n" data-field="작년점포일당">작년 점포·일당</th><th class="n" data-field="올해전환율">올해 전환 %</th><th class="n" data-field="작년전환율">작년 전환 %</th></tr></thead>
+      <tbody data-draw="tbl" data-cols="월,올해판매,작년판매,증감,올해일수,작년일수,올해일평균,작년일평균,올해점포일당,작년점포일당,올해전환율,작년전환율" data-fmts=",,,+.1f,,,.1f,.1f,.2f,.2f,.1f,.1f"></tbody></table></div></div>
+    <div class="grid2" style="margin-top:var(--cds-gap-md)" id="k-shares"></div>
+  </div>
+
+  <footer class="foot">Ploom Mobile Booth Official · 보고용 데일리 리포트 기준 · <span id="updated2">—</span></footer>
+</main>
+</div>
+
+<script src="dash.js?v=1"></script>
+<script src="app.js?v=1"></script>
+</body>
+</html>
