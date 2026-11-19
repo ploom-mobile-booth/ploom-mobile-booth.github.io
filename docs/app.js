@@ -81,7 +81,7 @@
     const 판매 = sum(S, r => r.수량), 일수 = uniq(S, r => r.일자), 방문자 = sum(DY, r => r.방문자);
     const st = storeStats(ST);
     const gift = DY.some(r => r.기프트카드 != null) ? sum(DY, r => r.기프트카드) : (S.some(r => r.기프트카드 != null) ? sum(S, r => r.기프트카드) : null);
-    return { 판매, 일수, 방문자, 전환율: pct(판매, 방문자), 일평균: 일수 ? r1(판매 / 일수) : null, 점포일: st.점포일, 점포일당: st.점포일당, 미판매율: st.미판매율,
+    return { 판매, 일수, 방문자, 전환율: pct(판매, 방문자), 일평균: 일수 ? r1(판매 / 일수) : null, 점포일: st.점포일, 하루점포: 일수 ? r1(st.점포일 / 일수) : null, 점포일당: st.점포일당, 미판매율: st.미판매율,
       판매점포: uniq(S.filter(r => r.점포코드), r => r.점포코드), 진행점포: uniq(ST.filter(r => r.점포코드), r => r.점포코드),
       회원가입률: rate(S, r => r.회원가입), 카카오율: rate(S, r => r.카카오), 기프트카드: gift, 기프트카드대당: (gift != null && 판매) ? r2(gift / 판매) : null,
       복수구매: DY.some(r => r.복수구매 != null) ? sum(DY, r => r.복수구매) : null };

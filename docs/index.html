@@ -71,7 +71,8 @@
       <div class="grid3">
         <div class="card"><h3 id="ov-month-title">월별 판매 (대)</h3><div class="chart" data-draw="vbar" data-source="m_month" data-x="월" data-y="판매"></div></div>
         <div class="card"><h3 id="ov-daily-title">일별 판매 (대)</h3><div class="chart" data-draw="line" data-source="ov_daily" data-x="일자" data-y="판매" data-xfmt="date"></div></div>
-        <div class="card"><h3>월별 방문자 대비 판매 (%)</h3><div class="chart" data-draw="line" data-source="m_month" data-x="월" data-y="전환율" data-fmt=".1f"></div></div>
+        <div class="card"><h3>월별 방문 점포 수 (곳)</h3><div class="chart" data-draw="vbar" data-source="m_month" data-x="월" data-y="진행점포"></div></div>
+      <div class="card"><h3>월별 방문자 대비 판매 (%)</h3><div class="chart" data-draw="line" data-source="m_month" data-x="월" data-y="전환율" data-fmt=".1f"></div></div>
         <div class="card"><h3>시간대별 판매 (대)</h3><div class="chart" data-draw="vbar" data-source="ov_hour" data-x="시간" data-y="판매" data-xsuffix="시"></div></div>
         <div class="card"><h3>요일별 하루 평균 판매 (대)</h3><div class="chart" data-draw="vbar" data-source="ov_wday" data-x="요일" data-y="일평균" data-fmt=".0f"></div></div>
         <div class="card"><h3>점포 구분별 점포·일당 판매 (대)</h3><div class="chart" data-draw="hbar" data-source="ov_kind" data-label="구분" data-value="점포일당" data-fmt=".2f" data-sub="점포일" data-subunit="건"></div></div>
@@ -82,9 +83,9 @@
   <!-- 월별·일별 -->
   <div class="panel" id="p-trend" hidden>
     <div class="card"><h3>월별 요약</h3>
-      <div class="tw"><table data-source="m_month"><thead><tr><th data-field="월">월</th><th class="n" data-field="판매">판매</th><th class="n" data-field="방문자">방문자</th><th class="n" data-field="전환율">전환 %</th><th class="n" data-field="일수">영업일</th><th class="n" data-field="일평균">일평균</th><th class="n" data-field="점포일">진행 점포·일</th><th class="n" data-field="점포일당">점포·일당</th><th class="n" data-field="미판매율">미판매 %</th><th class="n" data-field="회원가입률">회원가입 %</th><th class="n" data-field="카카오율">카카오 %</th><th class="n" data-field="기프트카드">기프트카드</th></tr></thead>
-      <tbody data-draw="tbl" data-cols="월,판매,방문자,전환율,일수,일평균,점포일,점포일당,미판매율,회원가입률,카카오율,기프트카드" data-fmts=",,,.1f,,.1f,,.2f,.1f,.1f,.1f,"></tbody></table></div>
-      <p class="note">방문자·기프트카드는 데일리 리포트 탭, 나머지는 판매 데이터·진행 점포 탭 기준. 머리글을 누르면 정렬됩니다.</p></div>
+      <div class="tw"><table data-source="m_month"><thead><tr><th data-field="월">월</th><th class="n" data-field="판매">판매</th><th class="n" data-field="방문자">방문자</th><th class="n" data-field="전환율">전환 %</th><th class="n" data-field="일수">영업일</th><th class="n" data-field="일평균">일평균</th><th class="n" data-field="진행점포">방문 점포 수</th><th class="n" data-field="점포일">진행 점포·일</th><th class="n" data-field="하루점포">하루 점포</th><th class="n" data-field="판매점포">판매 점포 수</th><th class="n" data-field="점포일당">점포·일당</th><th class="n" data-field="미판매율">미판매 %</th><th class="n" data-field="회원가입률">회원가입 %</th><th class="n" data-field="카카오율">카카오 %</th><th class="n" data-field="기프트카드">기프트카드</th></tr></thead>
+      <tbody data-draw="tbl" data-cols="월,판매,방문자,전환율,일수,일평균,진행점포,점포일,하루점포,판매점포,점포일당,미판매율,회원가입률,카카오율,기프트카드" data-fmts=",,,.1f,,.1f,,,.0f,,.2f,.1f,.1f,.1f,"></tbody></table></div>
+      <p class="note">방문 점포 수는 그 달에 한 번이라도 진행한 점포(고유), 진행 점포·일은 날짜별로 센 연인원, 하루 점포는 진행 점포·일을 영업일로 나눈 값입니다. 방문자·기프트카드는 데일리 리포트 탭 기준. 머리글을 누르면 정렬됩니다.</p></div>
     <div class="grid2" style="margin-top:var(--cds-gap-md)">
       <div class="card"><h3>주별 판매 (대)</h3><div class="chart" data-draw="line" data-source="m_week" data-x="주" data-y="판매" data-xfmt="date"></div><p class="note">월요일 시작 주.</p></div>
       <div class="card"><h3>주별 점포·일당 판매 (대)</h3><div class="chart" data-draw="line" data-source="m_week" data-x="주" data-y="점포일당" data-xfmt="date" data-fmt=".2f"></div></div>
@@ -242,6 +243,6 @@
 </div>
 
 <script src="dash.js?v=1"></script>
-<script src="app.js?v=2"></script>
+<script src="app.js?v=3"></script>
 </body>
 </html>
