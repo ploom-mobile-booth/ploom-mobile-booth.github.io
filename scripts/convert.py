@@ -105,7 +105,7 @@ def header_map(ws, keys, must, max_scan=6):
 def rows_of(ws, col, hrow):
     for r in ws.iter_rows(min_row=hrow + 1, values_only=True):
         if not r or all(x is None for x in r): continue
-        yield {k: (r[j] if j < len(r) else None) for k, j in col.items()}
+        o = {k: (r[j] if j < len(r) else None) for k, j in col.items()}; o["_raw"] = r; yield o
 
 # ---------- 탭별 변환 ----------
 DAILY = [("일자", [r"^날짜$", r"^Date$"]), ("운영구분", [r"운영 구분"]), ("판매", [r"디바이스 판매 수", r"^Sales Qty"]), ("방문자", [r"방문자", r"Visitor"]),
@@ -183,6 +183,17 @@ def conv_schedule(wb):
         for r in rows_of(ws, col, h):
             d = kdate(r.get("일자"))
             if not d: continue
+            # 머리글과 자료가 어긋난 달(2025-09 등): 점포 코드(KA_…) 위치를 기준으로 열을 다시 잡는다
+            raw = [s(x) for x in r["_raw"]]
+            if not re.match(r"^KA_", s(r.get("코드"))):
+                ci = next((i for i, x in enumerate(raw) if re.match(r"^KA_[\dA-Z]", x)), None)
+                if ci is not None:
+                    r["코드"], r["브랜드"], r["점포명"], r["주소"] = raw[ci], raw[ci + 1] if ci + 1 < len(raw) else "", raw[ci + 2] if ci + 2 < len(raw) else "", raw[ci + 3] if ci + 3 < len(raw) else ""
+                    r["점포구분"] = raw[ci - 1] if ci >= 1 and ("점포" in raw[ci - 1] or "흡연" in raw[ci - 1]) else None
+                    r["신규"] = raw[ci - 2] if ci >= 2 and raw[ci - 2] in ("기존", "신규") else None
+                    r["구"] = next((x for x in raw[ci + 4:ci + 7] if re.match(r"^[가-힣]{1,4}(구|시|군)$", x)), None)
+                    col.setdefault("주소", 0); col.setdefault("점포구분", 0)
+            if not re.match(r"^[가-힣]{1,4}(구|시|군)$", s(r.get("구"))): r["구"] = None
             team = re.sub(r"\D", "", s(r.get("팀")))
             nk = s(r.get("신규")); nk = "신규" if "신규" in nk or nk.startswith("신") else ("기존" if "기존" in nk else None)
             out.append([d, int(team) if team else None, s(r.get("시간")) or None, nk, kind(r.get("점포구분")) if "점포구분" in col else None,
