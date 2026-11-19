@@ -99,7 +99,10 @@
     share('ov_route', S, '경로', r => r.경로); share('ov_brand', S, '브랜드', r => r.브랜드); share('ov_color', S, '색상', r => r.색상, 6);
     // 월별
     const months = [...new Set(DY.map(r => r.월).concat(S.map(r => r.월)))].sort();
-    const mrows = months.map(m => { const s = summary(S.filter(r => r.월 === m), ST.filter(r => r.월 === m), DY.filter(r => r.월 === m)); return Object.assign({ 월: mlabel(m), 월키: m }, s); });
+    const SC = D.sched.filter(r => matchYM(r) && r.팀);
+    const teamStat = g => { const days = group(g, r => r.일자); return { 팀수: uniq(g, r => r.팀), 하루팀수: days.size ? r1([...days.values()].reduce((a, x) => a + uniq(x, r => r.팀), 0) / days.size) : null }; };
+    const mrows = months.map(m => { const s = summary(S.filter(r => r.월 === m), ST.filter(r => r.월 === m), DY.filter(r => r.월 === m)); return Object.assign({ 월: mlabel(m), 월키: m }, s, teamStat(SC.filter(r => r.월 === m))); });
+    Object.assign(o, teamStat(SC)); dash.set('ov', [o]);
     dash.set('m_month', mrows);
     // 일별 (한눈에 보기: 월 필터가 없으면 가장 최근 달)
     const lastM = F.month || months[months.length - 1];
