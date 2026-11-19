@@ -115,7 +115,10 @@
     </div>
     <div class="card" style="margin-top:var(--cds-gap-md)"><h3>월별 × 브랜드 방문 점포 수 (곳)</h3>
       <div class="tw"><table data-source="s_brand_month"><thead><tr><th data-field="월">월</th></tr></thead><tbody data-draw="tbl" data-cols="월" data-fmts=""></tbody></table></div>
-      <p class="note">그 달에 한 번이라도 진행한 점포를 점포 코드 기준으로 센 값. 달을 합치면 같은 점포가 여러 달에 잡히므로 브랜드별 요약의 누적 점포 수보다 합이 큽니다.</p></div>
+      <p class="note">그 달에 한 번이라도 진행한 점포를 점포 코드 기준으로 센 값(중복 없음). 달을 합치면 같은 점포가 여러 달에 잡히므로 브랜드별 요약의 누적 점포 수보다 합이 큽니다.</p>
+      <h3 style="margin-top:var(--cds-gap-md)">월별 × 브랜드 진행 점포·일 (중복 포함)</h3>
+      <div class="tw"><table data-source="s_brand_month_days"><thead><tr><th data-field="월">월</th></tr></thead><tbody data-draw="tbl" data-cols="월" data-fmts=""></tbody></table></div>
+      <p class="note">같은 점포를 여러 날 진행하면 날마다 한 건씩 센 값.</p></div>
     <div class="card" style="margin-top:var(--cds-gap-md)"><h3>점포별 성과</h3>
       <div class="toolbar"><input type="search" id="store-q" placeholder="점포명, 브랜드, 지역, 코드로 찾기" style="max-width:360px"><span class="muted" id="store-count"></span></div>
       <div class="tw"><table data-source="s_stores"><thead><tr><th data-field="점포명">점포</th><th data-field="브랜드">브랜드</th><th data-field="구분">구분</th><th data-field="구">지역</th><th class="n" data-field="판매">판매</th><th class="n" data-field="진행일">진행일</th><th class="n" data-field="일당">일당</th><th class="n" data-field="미판매일">미판매일</th><th data-field="첫진행">첫 진행</th><th data-field="마지막진행">마지막 진행</th></tr></thead>
@@ -253,6 +256,6 @@
 </div>
 
 <script src="dash.js?v=1"></script>
-<script src="app.js?v=6"></script>
+<script src="app.js?v=7"></script>
 </body>
 </html>
