@@ -118,7 +118,7 @@ STORES = [("일자", [r"^날짜$"]), ("시간대", [r"^시간$"]), ("구분", [r
 CVS = [("일자", [r"^날짜$"]), ("코드", [r"점포 코드"]), ("브랜드", [r"점포 타입"]), ("점포명", [r"^점포명"]), ("출고일", [r"출고 일자"]), ("출고", [r"출고 수량"]), ("반납일", [r"반납 일자"]), ("반납", [r"반납 수량"])]
 SCHED = [("팀", [r"^팀$"]), ("일자", [r"^날짜$"]), ("시간", [r"^시간$"]), ("신규", [r"^구분$"]), ("점포구분", [r"점포/흡연구역", r"^장소$"]),
          ("코드", [r"^점포코드$", r"^Account Code$", r"^Code$"]), ("브랜드", [r"^점포 타입$", r"^KA$", r"^Type$"]), ("점포명", [r"^점포명$", r"^Account Name$", r"^Name$"]),
-         ("주소", [r"^주소$", r"^Address"]), ("구", [r"CTY_RGN_NM"]), ("권역", [r"Expansion_Re"])]
+         ("주소", [r"^주소$", r"^Address"]), ("구", [r"CTY_RGN_NM"]), ("권역", [r"Expansion_Re"]), ("지점", [r"^Depot$", r"^지점$", r"^DEPOT$"])]
 
 def conv_daily(wb):
     ws = wb["데일리 리포트"]; col, h = header_map(ws, DAILY, ["No."]); out = []
@@ -197,9 +197,19 @@ def conv_schedule(wb):
             team = re.sub(r"\D", "", s(r.get("팀")))
             nk = s(r.get("신규")); nk = "신규" if "신규" in nk or nk.startswith("신") else ("기존" if "기존" in nk else None)
             out.append([d, int(team) if team else None, s(r.get("시간")) or None, nk, kind(r.get("점포구분")) if "점포구분" in col else None,
-                        s(r.get("코드")) or None, brand(r.get("브랜드")), s(r.get("점포명")) or None, s(r.get("구")) or None, sido(r.get("주소")) if "주소" in col else None])
+                        s(r.get("코드")) or None, brand(r.get("브랜드")), s(r.get("점포명")) or None, s(r.get("구")) or None, sido(r.get("주소")) if "주소" in col else None,
+                        zone(r.get("권역")), depot(r.get("지점"))])
     return out
-SCHED_COLS = ["일자", "팀", "시간", "신규", "점포구분", "점포코드", "브랜드", "점포명", "구", "시도"]
+SCHED_COLS = ["일자", "팀", "시간", "신규", "점포구분", "점포코드", "브랜드", "점포명", "구", "시도", "권역", "지점"]
+def zone(v):
+    t = s(v)
+    if not t: return None
+    return {"Seoul": "서울", "Incheon": "인천", "1st Expansion": "1차 확장", "2nd Expansion": "2차 확장"}.get(t, t)
+def depot(v):   # 지점 이름만 받고(열이 밀려 사람 이름이 들어온 경우는 버림) 표기를 통일
+    t = s(v).upper()
+    for k, name in [("SOUTH SEOUL", "South Seoul"), ("EAST SEOUL", "East Seoul"), ("INCHEON", "Incheon"), ("SUWON", "Suwon"), ("HQ", "HQ")]:
+        if k in t: return name
+    return None
 
 def pack(cols, rows, dict_cols):
     dicts, enc = {}, {}
@@ -235,7 +245,7 @@ save("sales.json", pack(SALES_COLS, sales, ["일자", "구분", "점포코드", 
 save("stores.json", pack(STORES_COLS, stores, ["일자", "시간대", "구분", "점포코드", "브랜드", "점포명"]))
 save("cvs.json", pack(CVS_COLS, cvs, ["일자", "점포코드", "브랜드", "점포명", "반납일"]))
 save("feedback.json", feedback)
-save("schedule.json", pack(SCHED_COLS, sched, ["일자", "시간", "신규", "점포구분", "점포코드", "브랜드", "점포명", "구", "시도"]))
+save("schedule.json", pack(SCHED_COLS, sched, ["일자", "시간", "신규", "점포구분", "점포코드", "브랜드", "점포명", "구", "시도", "권역", "지점"]))
 latest = max(meta, key=lambda m: m["기준일"])
 json.dump({"files": meta, "updated": dt.datetime.now().strftime("%Y-%m-%d %H:%M"), "latest": latest["기준일"], "latest_file": latest["파일"]}, open(os.path.join(OUT, "meta.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
 print("기준:", latest["기준일"], latest["파일"])

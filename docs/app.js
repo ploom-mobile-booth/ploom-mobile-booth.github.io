@@ -48,7 +48,7 @@
     // 스케줄로 점포·일의 지역·신규 여부 보강
     const sk = new Map(); D.sched.forEach(r => { if (r.점포코드) sk.set(r.일자 + '|' + r.점포코드, r); });
     const codeInfo = new Map(); D.sched.forEach(r => { if (r.점포코드 && !codeInfo.has(r.점포코드)) codeInfo.set(r.점포코드, r); });
-    const enrich = r => { const s = (r.점포코드 && (sk.get(r.일자 + '|' + r.점포코드) || codeInfo.get(r.점포코드))) || null; r.구 = s ? s.구 : null; r.시도 = s ? s.시도 : null; r.권역 = s ? s.권역 : null; r.신규 = s ? (s.신규 || null) : null; };
+    const enrich = r => { const s = (r.점포코드 && (sk.get(r.일자 + '|' + r.점포코드) || codeInfo.get(r.점포코드))) || null; r.구 = s ? s.구 : null; r.시도 = s ? s.시도 : null; r.권역 = s ? s.권역 : null; r.지점 = s ? s.지점 : null; r.신규 = s ? (s.신규 || null) : null; };
     D.stores.forEach(enrich); D.sales.forEach(enrich);
     $('updated').textContent = meta.latest + ' 파일'; $('updated2').textContent = '마지막 파일 ' + meta.latest_file;
   }
@@ -127,6 +127,8 @@
     const sido = r => r.시도 || '미상';
     dash.set('r_sido', [...group(ST, sido)].map(([k, g]) => ({ 시도: k, 판매: sum(g, r => r.판매) })).sort((a, b) => b.판매 - a.판매));
     dash.set('r_zone', [...group(ST.filter(r => r.권역), r => r.권역)].map(([k, g]) => ({ 권역: k, 판매: sum(g, r => r.판매), 점포일: g.length })).sort((a, b) => b.판매 - a.판매));
+    dash.set('r_depot', [...group(ST.filter(r => r.지점), r => r.지점)].map(([k, g]) => Object.assign({ 지점: k, 점포수: uniq(g, r => r.점포코드) }, storeStats(g))).sort((a, b) => b.판매 - a.판매));
+    dash.set('r_month_depot', months.map(m => { const g = ST.filter(r => r.월 === m); const o = { 월: mlabel(m), 판매: sum(g, r => r.판매) }; ['South Seoul', 'East Seoul', 'Incheon', 'Suwon'].forEach(z => o[z] = sum(g.filter(r => r.지점 === z), r => r.판매)); return o; }));
     dash.set('r_gu', [...group(ST.filter(r => r.구), r => (r.시도 || '') + '|' + r.구)].map(([k, g]) => Object.assign({ 시도: g[0].시도 || '', 구: g[0].구, 점포수: uniq(g, r => r.점포코드) }, storeStats(g))).sort((a, b) => b.판매 - a.판매));
     dash.set('r_month_sido', months.map(m => { const g = ST.filter(r => r.월 === m); const o = { 월: mlabel(m), 판매: sum(g, r => r.판매) }; ['서울', '경기', '인천'].forEach(s => o[s] = sum(g.filter(r => r.시도 === s), r => r.판매)); o.기타 = o.판매 - o.서울 - o.경기 - o.인천; return o; }));
     // 상품·고객

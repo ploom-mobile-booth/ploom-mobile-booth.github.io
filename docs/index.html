@@ -123,7 +123,13 @@
   <div class="panel" id="p-region" hidden>
     <div class="grid2">
       <div class="card"><h3>시도 비중 (판매)</h3><div class="donut" data-draw="donut" data-source="r_sido" data-label="시도" data-value="판매"></div><p class="note">스케줄 탭 주소 기준. 스케줄에 없는 점포는 "미상".</p></div>
-      <div class="card"><h3>권역별 판매 (대)</h3><div class="chart" data-draw="hbar" data-source="r_zone" data-label="권역" data-value="판매" data-sub="점포일" data-subunit="건"></div><p class="note">스케줄 탭에 권역 열이 있는 달만.</p></div>
+      <div class="card"><h3>권역별 판매 (대)</h3><div class="chart" data-draw="hbar" data-source="r_zone" data-label="권역" data-value="판매" data-sub="점포일" data-subunit="건"></div><p class="note">스케줄 탭의 Expansion Region 기준. 올해 8월부터 있는 열이라 그 전 달은 비어 있습니다.</p></div>
+      <div class="card"><h3>지점(Depot)별 요약</h3>
+        <div class="tw"><table data-source="r_depot"><thead><tr><th data-field="지점">지점</th><th class="n" data-field="점포수">점포 수</th><th class="n" data-field="점포일">점포·일</th><th class="n" data-field="판매">판매</th><th class="n" data-field="점포일당">점포·일당</th><th class="n" data-field="미판매율">미판매 %</th></tr></thead>
+        <tbody data-draw="tbl" data-cols="지점,점포수,점포일,판매,점포일당,미판매율" data-fmts=",,,,.2f,.1f"></tbody></table></div><p class="note">스케줄 탭의 Depot(지점) 기준.</p></div>
+      <div class="card"><h3>월별 × 지점 판매 (대)</h3>
+        <div class="legend" data-source="r_month_depot"><span><i data-c="0"></i>South Seoul</span><span><i data-c="1"></i>East Seoul</span><span><i data-c="2"></i>Incheon</span><span><i data-c="3"></i>Suwon</span></div>
+        <div class="chart" data-draw="vbar" data-source="r_month_depot" data-x="월" data-y="South Seoul,East Seoul,Incheon,Suwon" data-total="판매"></div></div>
     </div>
     <div class="card" style="margin-top:var(--cds-gap-md)"><h3>구별 성과</h3>
       <div class="tw"><table data-source="r_gu"><thead><tr><th data-field="시도">시도</th><th data-field="구">구</th><th class="n" data-field="점포수">점포 수</th><th class="n" data-field="점포일">점포·일</th><th class="n" data-field="판매">판매</th><th class="n" data-field="점포일당">점포·일당</th><th class="n" data-field="미판매율">미판매 %</th></tr></thead>
@@ -243,6 +249,6 @@
 </div>
 
 <script src="dash.js?v=1"></script>
-<script src="app.js?v=3"></script>
+<script src="app.js?v=4"></script>
 </body>
 </html>
