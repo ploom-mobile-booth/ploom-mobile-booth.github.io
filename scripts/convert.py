@@ -65,6 +65,15 @@ def brand(v):
     if "이마트" in t: return "이마트24"
     if t.upper().startswith("CSPACE") or t.upper().startswith("C-SPACE"): return "C-Space"
     return t
+CODE_BRAND = {"03": "CU", "09": "세븐일레븐", "05": "GS25", "23": "이마트24"}
+def brand_by_code(code, fallback):   # 점포 코드 KA_03-… → CU, 09 → 세븐일레븐, 05 → GS25, 23 → 이마트24 (코드가 없거나 다른 체계면 적힌 브랜드)
+    m = re.match(r"^KA_(\d{2})", s(code))
+    return CODE_BRAND.get(m.group(1), fallback) if m else fallback
+def code_of(v, name):   # 점포 코드가 'KA_…' 꼴이 아니면(흡연구역, - 등) 점포명으로 대신 식별
+    t = s(v)
+    if re.match(r"^KA_", t): return t
+    n = s(name)
+    return ("명:" + n) if n and n != "-" else None
 def kind(v):
     t = s(v)
     if not t: return None
@@ -135,7 +144,7 @@ def conv_sales(wb):
     for r in rows_of(ws, col, h):
         d = kdate(r.get("일자"))
         if not d: continue
-        out.append([d, hour(r.get("시간")), kind(r.get("구분")) if "구분" in col else None, s(r.get("코드")) or None, brand(r.get("브랜드")), s(r.get("점포명")) or None,
+        out.append([d, hour(r.get("시간")), kind(r.get("구분")) if "구분" in col else None, code_of(r.get("코드"), r.get("점포명")), brand_by_code(r.get("코드"), brand(r.get("브랜드"))), s(r.get("점포명")) or None,
                     route(r.get("경로")), color(r.get("색상")), num(r.get("수량"), 1) or 1,
                     yn(r.get("회원가입"), "완료", "미완료") if "회원가입" in col else None, yn(r.get("카카오"), "완료", "미완료") if "카카오" in col else None,
                     num(r.get("기프트카드"), 0) if "기프트카드" in col else None, s(r.get("운영구분")) or None])
@@ -148,7 +157,7 @@ def conv_stores(wb):
         d = kdate(r.get("일자"))
         if not d or not s(r.get("코드")) and not s(r.get("점포명")): continue
         t = s(r.get("시간대")).replace(" ", "").lower(); t = "종일" if "all" in t or t in ("종일", "평일", "주말") else ("오전" if "오전" in t else "오후" if "오후" in t else "야간" if "야간" in t else (s(r.get("시간대")) or None))
-        out.append([d, t, kind(r.get("구분")) if "구분" in col else None, s(r.get("코드")) or None, brand(r.get("브랜드")), s(r.get("점포명")) or None, num(r.get("판매")), 1 if s(r.get("비고")) else 0])
+        out.append([d, t, kind(r.get("구분")) if "구분" in col else None, code_of(r.get("코드"), r.get("점포명")), brand_by_code(r.get("코드"), brand(r.get("브랜드"))), s(r.get("점포명")) or None, num(r.get("판매")), 1 if s(r.get("비고")) else 0])
     return out
 STORES_COLS = ["일자", "시간대", "구분", "점포코드", "브랜드", "점포명", "판매", "비고있음"]
 
@@ -159,7 +168,7 @@ def conv_cvs(wb):
     for r in rows_of(ws, col, h):
         d = kdate(r.get("일자"))
         if not d: continue
-        out.append([d, s(r.get("코드")) or None, brand(r.get("브랜드")), s(r.get("점포명")) or None, num(r.get("출고")), num(r.get("반납")), kdate(r.get("반납일")) if "반납일" in col else None])
+        out.append([d, code_of(r.get("코드"), r.get("점포명")), brand_by_code(r.get("코드"), brand(r.get("브랜드"))), s(r.get("점포명")) or None, num(r.get("출고")), num(r.get("반납")), kdate(r.get("반납일")) if "반납일" in col else None])
     return out
 CVS_COLS = ["일자", "점포코드", "브랜드", "점포명", "출고", "반납", "반납일"]
 
@@ -197,7 +206,7 @@ def conv_schedule(wb):
             team = re.sub(r"\D", "", s(r.get("팀")))
             nk = s(r.get("신규")); nk = "신규" if "신규" in nk or nk.startswith("신") else ("기존" if "기존" in nk else None)
             out.append([d, int(team) if team else None, s(r.get("시간")) or None, nk, kind(r.get("점포구분")) if "점포구분" in col else None,
-                        s(r.get("코드")) or None, brand(r.get("브랜드")), s(r.get("점포명")) or None, s(r.get("구")) or None, sido(r.get("주소")) if "주소" in col else None,
+                        code_of(r.get("코드"), r.get("점포명")), brand_by_code(r.get("코드"), brand(r.get("브랜드"))), s(r.get("점포명")) or None, s(r.get("구")) or None, sido(r.get("주소")) if "주소" in col else None,
                         zone(r.get("권역")), depot(r.get("지점"))])
     return out
 SCHED_COLS = ["일자", "팀", "시간", "신규", "점포구분", "점포코드", "브랜드", "점포명", "구", "시도", "권역", "지점"]
