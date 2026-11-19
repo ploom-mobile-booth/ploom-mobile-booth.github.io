@@ -63,13 +63,14 @@ def brand(v):
     if re.match(r"^GS\d*", t): return "GS25"
     if "세븐" in t: return "세븐일레븐"
     if "이마트" in t: return "이마트24"
+    if t.upper().startswith("CSPACE") or t.upper().startswith("C-SPACE"): return "C-Space"
     return t
 def kind(v):
     t = s(v)
     if not t: return None
-    if "흡연" in t: return "흡연구역"
-    if "점포" in t: return "점포(신규)" if "신규" in t else "점포"
-    return t
+    if "흡연" in t or "흠연" in t: return "흡연구역"
+    if "점포" in t or "신규" in t: return "점포"
+    return None   # 'All Day', '3' 같이 열이 밀린 값은 버림
 def route(v):
     t = s(v)
     if not t: return None
@@ -146,7 +147,7 @@ def conv_stores(wb):
     for r in rows_of(ws, col, h):
         d = kdate(r.get("일자"))
         if not d or not s(r.get("코드")) and not s(r.get("점포명")): continue
-        t = s(r.get("시간대")).replace(" ", "").lower(); t = "종일" if "all" in t or t == "종일" else ("오전" if "오전" in t else "오후" if "오후" in t else (s(r.get("시간대")) or None))
+        t = s(r.get("시간대")).replace(" ", "").lower(); t = "종일" if "all" in t or t in ("종일", "평일", "주말") else ("오전" if "오전" in t else "오후" if "오후" in t else "야간" if "야간" in t else (s(r.get("시간대")) or None))
         out.append([d, t, kind(r.get("구분")) if "구분" in col else None, s(r.get("코드")) or None, brand(r.get("브랜드")), s(r.get("점포명")) or None, num(r.get("판매")), 1 if s(r.get("비고")) else 0])
     return out
 STORES_COLS = ["일자", "시간대", "구분", "점포코드", "브랜드", "점포명", "판매", "비고있음"]
