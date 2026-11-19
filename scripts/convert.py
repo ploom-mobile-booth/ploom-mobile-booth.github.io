@@ -227,3 +227,59 @@ save("schedule.json", pack(SCHED_COLS, sched, ["일자", "시간", "신규", "�
 latest = max(meta, key=lambda m: m["기준일"])
 json.dump({"files": meta, "updated": dt.datetime.now().strftime("%Y-%m-%d %H:%M"), "latest": latest["기준일"], "latest_file": latest["파일"]}, open(os.path.join(OUT, "meta.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
 print("기준:", latest["기준일"], latest["파일"])
+
+# ---------- Activation 시트: Channel = Ploom Agent 행 → funnel.json ----------
+ACTIVATION = r"C:\Users\VRID\OneDrive\Desktop\2026 Ploom Project\D2C\세일즈 데이터\Raw Data"   # 2025~26 RRP Activation Data_*.xlsx (가장 최근 파일)
+TEAM_DAY = r"C:\Users\VRID\ploom-report\docs\data\team_day.json"   # 내부 사이트의 팀·일 활동 요약 (시작 시각·활동 시간·방문 점포)
+def conv_activation():
+    fs = sorted(glob.glob(os.path.join(ACTIVATION, "*RRP Activation Data*.xlsx")), key=os.path.getmtime)
+    if not fs: print("Activation 파일 없음"); return
+    wb = openpyxl.load_workbook(fs[-1], read_only=True, data_only=True)
+    ws = next((w for w in wb.worksheets if "Activation" in w.title), wb.worksheets[1])
+    rows = list(ws.iter_rows(values_only=True))
+    hi = next(i for i, r in enumerate(rows) if r and s(r[0]) == "Commercial Engine"); hdr = rows[hi]
+    R = {s(r[1]): r for r in rows[hi + 1:] if r and s(r[2]) == "Ploom Agent"}
+    KEY = {"접촉": "# of contacts (exposure)", "응대": "# of 1-2-1 engagements", "판매": "# of device sold", "시용": "# of trials", "카카오": "# of subscription to Kakao",
+           "웹가입": "# of subscription to Ploom Website", "프로모터": "# of promotors", "스팟": "# of execution spots/events (per month)", "운영일": "# of operation days", "근무시간": "# of working hours (operation days*working hours)"}
+    out = []
+    for i in range(3, len(hdr)):
+        h = hdr[i]
+        if isinstance(h, (dt.datetime, dt.date)): ym = h.strftime("%Y-%m")
+        else:
+            m = re.match(r"(\d{1,2})/(\d{1,2})/(\d{4})", s(h))
+            if not m: continue
+            ym = f"{m.group(3)}-{int(m.group(1)):02d}"
+        o = {"월": ym}
+        for k, src in KEY.items():
+            v = R[src][i] if src in R and i < len(R[src]) else None
+            o[k] = num(v, 0) if v not in (None, "") else 0
+        if o["접촉"] or o["판매"]: out.append(o)
+    json.dump(out, open(os.path.join(OUT, "funnel.json"), "w", encoding="utf-8"), ensure_ascii=False)
+    print(f"  funnel.json: {len(out)}달 ({os.path.basename(fs[-1])})")
+
+# ---------- 내부 활동 요약 → ops.json (팀 번호·이름 없이 달별 요약만) ----------
+def conv_ops():
+    if not os.path.exists(TEAM_DAY): print("team_day 없음"); return
+    j = json.load(open(TEAM_DAY, encoding="utf-8")); cols = j["cols"]; d = j["dict"]
+    rows = [{c: (d[c][v] if c in d and v is not None else v) for c, v in zip(cols, r)} for r in j["rows"]]
+    rows = [r for r in rows if r.get("팀") and r["팀"] < 900]
+    hm = lambda t: (int(t[:2]) + int(t[3:5]) / 60) if t else None
+    bym = {}
+    for r in rows: bym.setdefault(r["일자"][:7], []).append(r)
+    out = []
+    for m, g in sorted(bym.items()):
+        st = sorted(hm(r["활동시작"]) for r in g if r.get("활동시작")); hrs = [r["활동시간"] for r in g if r.get("활동시간") is not None]
+        dist = {}
+        for v in st: k = int(v * 2) / 2; dist[k] = dist.get(k, 0) + 1
+        o = {"월": m, "팀일": len(g), "시작중앙값": None, "시작평균": None, "10시30분전시작비율": None, "평균활동시간": round(sum(hrs) / len(hrs), 2) if hrs else None,
+             "하루방문점포": round(sum(r["방문점포"] for r in g) / len(g), 2), "이동팀일비율": round(sum(1 for r in g if r["이동"] > 0) / len(g) * 100, 1), "팀일당판매": round(sum(r["판매"] for r in g) / len(g), 2),
+             "미판매율": round(sum(1 for r in g if r["판매"] == 0) / len(g) * 100, 1),
+             "시작분포": [{"시각": "%02d:%02d" % (int(k), int((k % 1) * 60)), "비율": round(v / len(st) * 100, 1)} for k, v in sorted(dist.items()) if 9 <= k <= 12] if st else []}
+        if st:
+            med = st[len(st) // 2]; mean = sum(st) / len(st)
+            o["시작중앙값"] = "%02d:%02d" % (int(med), int((med % 1) * 60)); o["시작평균"] = "%02d:%02d" % (int(mean), int((mean % 1) * 60)); o["10시30분전시작비율"] = round(sum(1 for v in st if v <= 10.5) / len(st) * 100, 1)
+        out.append(o)
+    json.dump(out, open(os.path.join(OUT, "ops.json"), "w", encoding="utf-8"), ensure_ascii=False)
+    print(f"  ops.json: {len(out)}달")
+
+conv_activation(); conv_ops()

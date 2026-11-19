@@ -28,6 +28,7 @@
     <a href="#stores" data-panel="p-stores" data-title="점포" title="점포"><svg viewBox="0 0 24 24"><path d="M3 21h18M5 21V9l7-5 7 5v12"/><path d="M10 21v-6h4v6"/></svg><span>점포</span></a>
     <a href="#region" data-panel="p-region" data-title="지역" title="지역"><svg viewBox="0 0 24 24"><path d="M12 21s-7-5.5-7-11a7 7 0 0 1 14 0c0 5.5-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg><span>지역</span></a>
     <a href="#mix" data-panel="p-mix" data-title="상품·고객" title="상품·고객"><svg viewBox="0 0 24 24"><path d="M6 7h12l1 13H5z"/><path d="M9 7V5a3 3 0 0 1 6 0v2"/></svg><span>상품·고객</span></a>
+    <a href="#funnel" data-panel="p-funnel" data-title="활동 퍼널" title="활동 퍼널"><svg viewBox="0 0 24 24"><path d="M3 5h18l-7 8v6l-4-2v-4z"/></svg><span>활동 퍼널</span></a>
     <a href="#cvs" data-panel="p-cvs" data-title="CVS 차용" title="CVS 차용"><svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V4h8v3M3 12h18"/></svg><span>CVS 차용</span></a>
     <a href="#feedback" data-panel="p-feedback" data-title="소비자 피드백" title="소비자 피드백"><svg viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/></svg><span>소비자 피드백</span></a>
     <a href="#compare" data-panel="p-compare" data-title="작년 비교" title="작년 비교"><svg viewBox="0 0 24 24"><path d="M4 19V9"/><path d="M10 19V5"/><path d="M16 19v-8"/><path d="M22 19V3"/><path d="M2 19h21"/></svg><span>작년 비교</span></a>
@@ -147,6 +148,54 @@
     </div>
   </div>
 
+  <!-- 활동 퍼널 -->
+  <div class="panel" id="p-funnel" hidden>
+    <p class="note" style="margin-bottom:var(--cds-gap-md)">RRP Activation Data 시트의 Ploom Agent 행(월별 접촉·1:1 응대·판매·가입)과 내부 활동 기록 요약입니다. 연도·월 필터를 따르고 브랜드·구분 필터는 적용되지 않습니다. 응대 1건당 걸린 시간은 어느 자료에도 없어 넣지 못했습니다.</p>
+    <div class="hero"><div class="hero-top"><b id="fn-title">Agent Activity Funnel</b><span id="fn-sub"></span></div>
+      <div class="hero-stats">
+        <div><div class="k">접촉 (소비자)</div><div class="v"><span data-draw="num" data-source="f_kpi" data-field="접촉" data-row="0">—</span><span class="u">명</span></div></div>
+        <div><div class="k">1:1 응대</div><div class="v"><span data-draw="num" data-source="f_kpi" data-field="응대" data-row="0">—</span><span class="u">명</span></div></div>
+        <div><div class="k">응대율 (접촉 대비)</div><div class="v"><span data-draw="num" data-source="f_kpi" data-field="응대율" data-row="0" data-fmt=".1f">—</span><span class="u">%</span></div></div>
+        <div><div class="k">구매율 (응대 대비)</div><div class="v"><span data-draw="num" data-source="f_kpi" data-field="응대구매율" data-row="0" data-fmt=".1f">—</span><span class="u">%</span></div></div>
+      </div></div>
+    <div class="kpis">
+      <div class="kpi"><div class="k">판매</div><div class="v"><span data-draw="num" data-source="f_kpi" data-field="판매" data-row="0">—</span><span class="u">대</span></div><div class="s">접촉 대비 <span data-draw="num" data-source="f_kpi" data-field="접촉구매율" data-row="0" data-fmt=".2f">—</span>%</div><div class="ic o"><svg viewBox="0 0 24 24"><path d="M4 17l5-6 4 4 7-8"/><path d="M16 7h4v4"/></svg></div></div>
+      <div class="kpi"><div class="k">웹 회원가입</div><div class="v"><span data-draw="num" data-source="f_kpi" data-field="웹가입율" data-row="0" data-fmt=".1f">—</span><span class="u">%</span></div><div class="s">판매 대비 · <span data-draw="num" data-source="f_kpi" data-field="웹가입" data-row="0">—</span>건</div><div class="ic g"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M3 20a6 6 0 0 1 12 0"/><circle cx="17" cy="9" r="2.5"/><path d="M15.5 14.5A5 5 0 0 1 21 19"/></svg></div></div>
+      <div class="kpi"><div class="k">카카오 채널 구독</div><div class="v"><span data-draw="num" data-source="f_kpi" data-field="카카오율" data-row="0" data-fmt=".1f">—</span><span class="u">%</span></div><div class="s">판매 대비 · <span data-draw="num" data-source="f_kpi" data-field="카카오" data-row="0">—</span>건</div><div class="ic p"><svg viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/></svg></div></div>
+      <div class="kpi"><div class="k">시용 (Trial)</div><div class="v"><span data-draw="num" data-source="f_kpi" data-field="시용" data-row="0">—</span><span class="u">건</span></div><div class="s">판매 대비 <span data-draw="num" data-source="f_kpi" data-field="시용율" data-row="0" data-fmt=".1f">—</span>%</div><div class="ic r"><svg viewBox="0 0 24 24"><rect x="7" y="3" width="10" height="18" rx="2"/><path d="M7 9h10"/></svg></div></div>
+      <div class="kpi"><div class="k">운영일 · 프로모터</div><div class="v"><span data-draw="num" data-source="f_kpi" data-field="운영일" data-row="0">—</span><span class="u">일</span></div><div class="s">프로모터 월평균 <span data-draw="num" data-source="f_kpi" data-field="프로모터" data-row="0" data-fmt=".0f">—</span>명 · 하루 <span data-draw="num" data-source="f_kpi" data-field="일당시간" data-row="0" data-fmt=".1f">—</span>시간</div><div class="ic o"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></div></div>
+    </div>
+    <div class="grid2">
+      <div class="card"><h3>퍼널 (명·대)</h3><div class="chart" data-draw="hbar" data-source="f_funnel" data-label="단계" data-value="값" data-sub="비율" data-subfmt=".1f" data-subunit="%"></div><p class="note">비율은 바로 앞 단계 대비. 가입은 판매 대비.</p></div>
+      <div class="card"><h3>월별 응대율·구매율 (%)</h3><div class="legend" data-source="f_rate"><span><i data-c="0"></i>응대율 (접촉 대비)</span><span><i data-c="1"></i>구매율 (응대 대비)</span><span><i data-c="2"></i>구매율 (접촉 대비)</span></div>
+        <div class="chart" data-draw="line" data-source="f_rate" data-x="월" data-y="값" data-series="지표" data-order="응대율 (접촉 대비),구매율 (응대 대비),구매율 (접촉 대비)" data-fmt=".1f"></div></div>
+      <div class="card"><h3>월별 1:1 응대·판매</h3><div class="legend" data-source="f_month"><span><i data-c="0"></i>1:1 응대</span><span><i data-c="1"></i>판매</span></div><div class="chart" data-draw="vbar" data-source="f_month" data-x="월" data-y="응대,판매" data-grouped="1"></div></div>
+      <div class="card"><h3>월별 가입율 (판매 대비 %)</h3><div class="legend" data-source="f_reg"><span><i data-c="0"></i>웹 회원가입</span><span><i data-c="1"></i>카카오 구독</span></div>
+        <div class="chart" data-draw="line" data-source="f_reg" data-x="월" data-y="값" data-series="지표" data-order="웹 회원가입,카카오 구독" data-fmt=".1f"></div></div>
+    </div>
+    <div class="card" style="margin-top:var(--cds-gap-md)"><h3>월별 퍼널 표</h3>
+      <div class="tw"><table data-source="f_month"><thead><tr><th data-field="월">월</th><th class="n" data-field="접촉">접촉</th><th class="n" data-field="응대">1:1 응대</th><th class="n" data-field="응대율">응대율 %</th><th class="n" data-field="판매">판매</th><th class="n" data-field="응대구매율">응대→구매 %</th><th class="n" data-field="접촉구매율">접촉→구매 %</th><th class="n" data-field="시용">시용</th><th class="n" data-field="웹가입">웹 가입</th><th class="n" data-field="웹가입율">웹 가입 %</th><th class="n" data-field="카카오">카카오</th><th class="n" data-field="카카오율">카카오 %</th><th class="n" data-field="프로모터">프로모터</th><th class="n" data-field="운영일">운영일</th><th class="n" data-field="일당시간">일당 시간</th></tr></thead>
+      <tbody data-draw="tbl" data-cols="월,접촉,응대,응대율,판매,응대구매율,접촉구매율,시용,웹가입,웹가입율,카카오,카카오율,프로모터,운영일,일당시간" data-fmts=",,,.1f,,.1f,.2f,,,.1f,,.1f,,,.1f"></tbody></table></div>
+      <p class="note">시트의 "execution spots"는 팀 수와 같아 실제 방문 점포 수가 아닙니다. 방문 점포 수는 점포 메뉴의 진행 점포·일을 보세요.</p></div>
+    <div class="card" style="margin-top:var(--cds-gap-md)"><h3>올해 · 작년 같은 달 비교 (응대율 %)</h3><div class="legend" data-source="f_cmp"><span><i data-c="0"></i>올해</span><span><i data-c="1"></i>작년</span></div><div class="chart" data-draw="line" data-source="f_cmp" data-x="월" data-y="값" data-series="연도" data-order="올해,작년" data-fmt=".1f"></div></div>
+
+    <h2 style="margin-top:var(--cds-gap-xl)">실제 Agent 운영 모습</h2>
+    <p class="note" style="margin-bottom:var(--cds-gap-md)">내부 활동 기록(활동 시작·종료, 점포 이동)이 있는 달만 집계합니다. 2026년 10월부터입니다.</p>
+    <div class="kpis">
+      <div class="kpi"><div class="k">활동 시작 시각 (중앙값)</div><div class="v"><span data-draw="num" data-source="o_kpi" data-field="시작중앙값" data-row="0">—</span></div><div class="s">10시 30분 전 시작 <span data-draw="num" data-source="o_kpi" data-field="10시30분전시작비율" data-row="0" data-fmt=".0f">—</span>%</div><div class="ic p"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div></div>
+      <div class="kpi"><div class="k">하루 활동 시간</div><div class="v"><span data-draw="num" data-source="o_kpi" data-field="평균활동시간" data-row="0" data-fmt=".1f">—</span><span class="u">시간</span></div><div class="s">팀·일 <span data-draw="num" data-source="o_kpi" data-field="팀일" data-row="0">—</span>건 평균</div><div class="ic o"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></div></div>
+      <div class="kpi"><div class="k">하루 방문 점포</div><div class="v"><span data-draw="num" data-source="o_kpi" data-field="하루방문점포" data-row="0" data-fmt=".2f">—</span><span class="u">곳</span></div><div class="s">점포를 옮긴 팀·일 <span data-draw="num" data-source="o_kpi" data-field="이동팀일비율" data-row="0" data-fmt=".0f">—</span>%</div><div class="ic g"><svg viewBox="0 0 24 24"><path d="M3 21h18M5 21V9l7-5 7 5v12"/><path d="M10 21v-6h4v6"/></svg></div></div>
+      <div class="kpi"><div class="k">팀·일당 판매</div><div class="v"><span data-draw="num" data-source="o_kpi" data-field="팀일당판매" data-row="0" data-fmt=".2f">—</span><span class="u">대</span></div><div class="s">미판매 팀·일 <span data-draw="num" data-source="o_kpi" data-field="미판매율" data-row="0" data-fmt=".0f">—</span>%</div><div class="ic r"><svg viewBox="0 0 24 24"><path d="M4 17l5-6 4 4 7-8"/><path d="M16 7h4v4"/></svg></div></div>
+    </div>
+    <div class="grid2">
+      <div class="card"><h3>활동 시작 시각 분포 (팀·일 비율 %)</h3><div class="chart" data-draw="vbar" data-source="o_start" data-x="시각" data-y="비율" data-fmt=".1f"></div></div>
+      <div class="card"><h3>판매가 잘되는 시간대 (대)</h3><div class="chart" data-draw="vbar" data-source="ov_hour" data-x="시간" data-y="판매" data-xsuffix="시"></div><p class="note">보고용 판매 데이터의 판매 시각 기준. 위 필터를 따릅니다.</p></div>
+    </div>
+    <div class="card" style="margin-top:var(--cds-gap-md)"><h3>월별 운영 지표</h3>
+      <div class="tw"><table data-source="o_month"><thead><tr><th data-field="월">월</th><th class="n" data-field="팀일">팀·일</th><th data-field="시작중앙값">시작 중앙값</th><th data-field="시작평균">시작 평균</th><th class="n" data-field="10시30분전시작비율">10:30 전 시작 %</th><th class="n" data-field="평균활동시간">활동 시간</th><th class="n" data-field="하루방문점포">하루 방문 점포</th><th class="n" data-field="이동팀일비율">이동 팀·일 %</th><th class="n" data-field="팀일당판매">팀·일당 판매</th><th class="n" data-field="미판매율">미판매 %</th></tr></thead>
+      <tbody data-draw="tbl" data-cols="월,팀일,시작중앙값,시작평균,10시30분전시작비율,평균활동시간,하루방문점포,이동팀일비율,팀일당판매,미판매율" data-fmts=",,,,.1f,.1f,.2f,.1f,.2f,.1f"></tbody></table></div></div>
+  </div>
+
   <!-- CVS 차용 -->
   <div class="panel" id="p-cvs" hidden>
     <div class="kpis">
@@ -193,6 +242,6 @@
 </div>
 
 <script src="dash.js?v=1"></script>
-<script src="app.js?v=1"></script>
+<script src="app.js?v=2"></script>
 </body>
 </html>

@@ -11,7 +11,7 @@
   const weekStart = d => { const t = new Date(d + 'T00:00:00Z'); t.setUTCDate(t.getUTCDate() - (t.getUTCDay() + 6) % 7); return t.toISOString().slice(0, 10); };
   const mlabel = m => parseInt(m.slice(5, 7)) + '월';
   const decode = j => { const cols = j.cols, dict = j.dict || {}; return j.rows.map(a => { const o = {}; cols.forEach((c, i) => { let v = a[i]; if (dict[c] && v != null) v = dict[c][v]; o[c] = v; }); return o; }); };
-  const D = { daily: [], sales: [], stores: [], cvs: [], feedback: [], sched: [], meta: null };
+  const D = { daily: [], sales: [], stores: [], cvs: [], feedback: [], sched: [], meta: null, funnel: [], ops: [] };
   const F = { year: '', month: '', brand: '', kind: '' };
 
   // ---------- 열지도 그리기, 표 정렬 ----------
@@ -40,7 +40,8 @@
   // ---------- 자료 읽기 ----------
   async function load() {
     const v = Date.now(), get = n => fetch('data/' + n + '.json?v=' + v).then(r => r.json());
-    const [daily, sales, stores, cvs, feedback, sched, meta] = await Promise.all([get('daily'), get('sales'), get('stores'), get('cvs'), get('feedback'), get('schedule'), get('meta')]);
+    const [daily, sales, stores, cvs, feedback, sched, meta, funnel, ops] = await Promise.all([get('daily'), get('sales'), get('stores'), get('cvs'), get('feedback'), get('schedule'), get('meta'), get('funnel').catch(() => []), get('ops').catch(() => [])]);
+    D.funnel = funnel; D.ops = ops;
     D.daily = daily; D.sales = decode(sales); D.stores = decode(stores); D.cvs = decode(cvs); D.feedback = feedback; D.sched = decode(sched); D.meta = meta;
     const addm = r => { r.월 = r.일자.slice(0, 7); r.연도 = r.일자.slice(0, 4); r.요일 = wday(r.일자); };
     D.daily.forEach(addm); D.sales.forEach(addm); D.stores.forEach(addm); D.cvs.forEach(addm); D.sched.forEach(addm);
@@ -144,6 +145,7 @@
     const fb = D.feedback.filter(r => (!F.year || String(r.연도) === F.year) && (!F.month || r.월 === parseInt(F.month.slice(5, 7))));
     const byW = group(fb, r => r.연도 + '-' + String(r.월).padStart(2, '0') + '|' + r.주차);
     $('fb-list').innerHTML = [...byW].sort((a, b) => a[0] < b[0] ? 1 : -1).map(([k, g]) => `<div class="card fb-week"><h3>${parseInt(k.slice(5, 7))}월 ${g[0].주차}</h3>${g.map(r => `<div class="fb-item"><b>${r.유형}</b><div>${r.내용.replace(/</g, '&lt;')}</div></div>`).join('')}</div>`).join('') || '<p class="note">해당 기간 피드백이 없습니다.</p>';
+    funnel();
     // 작년 비교
     compare();
     markNoFilter(); dash.render();
@@ -162,6 +164,33 @@
   function renderChips() {
     const parts = [F.year + '년', F.month ? mlabel(F.month) : '전체 달', F.brand, F.kind].filter(Boolean);
     $('chips').textContent = parts.join(' · ') + (bkActive() ? ' (방문자·기프트카드는 브랜드·구분 필터 미적용)' : '');
+  }
+
+
+  // ---------- 활동 퍼널 (Activation 시트) · 운영 모습 (내부 활동 요약) ----------
+  function funnel() {
+    const inYM = r => (!F.year || r.월.slice(0, 4) === F.year) && (!F.month || r.월 === F.month);
+    const Fm = D.funnel.filter(inYM);
+    const agg = g => { const o = { 접촉: sum(g, r => r.접촉), 응대: sum(g, r => r.응대), 판매: sum(g, r => r.판매), 시용: sum(g, r => r.시용), 웹가입: sum(g, r => r.웹가입), 카카오: sum(g, r => r.카카오), 운영일: sum(g, r => r.운영일), 근무시간: sum(g, r => r.근무시간), 프로모터: g.length ? r1(sum(g, r => r.프로모터) / g.length) : null };
+      o.응대율 = pct(o.응대, o.접촉); o.응대구매율 = pct(o.판매, o.응대); o.접촉구매율 = o.접촉 ? r2(o.판매 / o.접촉 * 100) : null; o.웹가입율 = pct(o.웹가입, o.판매); o.카카오율 = pct(o.카카오, o.판매); o.시용율 = pct(o.시용, o.판매); o.일당시간 = o.운영일 ? r1(o.근무시간 / o.운영일) : null; return o; };
+    const k = agg(Fm); dash.set('f_kpi', [k]);
+    const ym = m => m.slice(0, 4) + '년 ' + parseInt(m.slice(5, 7)) + '월';
+    $('fn-sub').textContent = Fm.length ? ym(Fm[0].월) + ' ~ ' + ym(Fm[Fm.length - 1].월) + ' · RRP Activation Data 기준' : '해당 기간 자료 없음';
+    dash.set('f_funnel', [{ 단계: '접촉 (노출)', 값: k.접촉, 비율: null }, { 단계: '1:1 응대', 값: k.응대, 비율: k.응대율 }, { 단계: '판매', 값: k.판매, 비율: k.응대구매율 }, { 단계: '웹 회원가입', 값: k.웹가입, 비율: k.웹가입율 }, { 단계: '카카오 구독', 값: k.카카오, 비율: k.카카오율 }]);
+    const mrows = Fm.map(r => Object.assign({ 월: mlabel(r.월) }, agg([r]))); dash.set('f_month', mrows);
+    const rate = [], reg = []; mrows.forEach(m => { rate.push({ 월: m.월, 지표: '응대율 (접촉 대비)', 값: m.응대율 }); rate.push({ 월: m.월, 지표: '구매율 (응대 대비)', 값: m.응대구매율 }); rate.push({ 월: m.월, 지표: '구매율 (접촉 대비)', 값: m.접촉구매율 }); reg.push({ 월: m.월, 지표: '웹 회원가입', 값: m.웹가입율 }); reg.push({ 월: m.월, 지표: '카카오 구독', 값: m.카카오율 }); });
+    dash.set('f_rate', rate); dash.set('f_reg', reg);
+    const years = [...new Set(D.funnel.map(r => r.월.slice(0, 4)))].sort(); const cur = years[years.length - 1], prev = years[years.length - 2];
+    const cmp = []; for (let m = 1; m <= 12; m++) { const mm = String(m).padStart(2, '0'); const a = D.funnel.find(r => r.월 === cur + '-' + mm), b = prev && D.funnel.find(r => r.월 === prev + '-' + mm); if (!a && !b) continue; cmp.push({ 월: m + '월', 연도: '올해', 값: a ? pct(a.응대, a.접촉) : null }); cmp.push({ 월: m + '월', 연도: '작년', 값: b ? pct(b.응대, b.접촉) : null }); }
+    dash.set('f_cmp', cmp);
+    // 운영 모습
+    const Om = D.ops.filter(inYM); const tot = sum(Om, r => r.팀일);
+    const w = f => tot ? r2(sum(Om, r => (f(r) || 0) * r.팀일) / tot) : null;
+    const dist = {}; Om.forEach(r => (r.시작분포 || []).forEach(d => { dist[d.시각] = (dist[d.시각] || 0) + d.비율 * r.팀일; }));
+    dash.set('o_start', Object.keys(dist).sort().map(t => ({ 시각: t, 비율: r1(dist[t] / tot) })));
+    const last = Om[Om.length - 1];
+    dash.set('o_kpi', [Om.length ? { 시작중앙값: last.시작중앙값 + (Om.length > 1 ? ' (최근 달)' : ''), '10시30분전시작비율': w(r => r['10시30분전시작비율']), 평균활동시간: w(r => r.평균활동시간), 팀일: tot, 하루방문점포: w(r => r.하루방문점포), 이동팀일비율: w(r => r.이동팀일비율), 팀일당판매: w(r => r.팀일당판매), 미판매율: w(r => r.미판매율) } : {}]);
+    dash.set('o_month', Om.map(r => Object.assign({}, r, { 월: mlabel(r.월) })));
   }
 
   // ---------- 작년 비교 ----------

@@ -15,3 +15,7 @@
 - `scripts/convert.py` 엑셀 → JSON (탭별 머리글을 키워드로 맞추므로 달마다 열 이름이 조금 달라도 된다)
 - `docs/index.html`, `docs/app.js` 화면과 집계 (브라우저에서 계산), `docs/dash.js`·`docs/style.css` 그래프 엔진과 스타일
 - `docs/data/` daily(데일리 리포트), sales(판매 데이터), stores(진행 점포), cvs(차용), feedback(피드백), schedule(스케줄, 이름 제외), meta(파일 목록)
+
+## 추가 자료
+- `funnel.json`: `세일즈 데이터\Raw Data\*RRP Activation Data*.xlsx` 의 "(Raw) Activation" 시트에서 Channel = Ploom Agent 행만 (가장 최근 파일). 새 파일이 오면 convert.py 를 다시 돌리면 된다.
+- `ops.json`: 내부 사이트(ploom-report)의 팀·일 활동 요약을 달별 평균으로만 옮긴 것(시작 시각·활동 시간·방문 점포). 팀 번호·이름은 없다.
