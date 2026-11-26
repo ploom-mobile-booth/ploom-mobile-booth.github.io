@@ -40,8 +40,8 @@
   // ---------- 자료 읽기 ----------
   async function load() {
     const v = Date.now(), get = n => fetch('data/' + n + '.json?v=' + v).then(r => r.json());
-    const [daily, sales, stores, cvs, feedback, sched, meta, funnel, ops, inv] = await Promise.all([get('daily'), get('sales'), get('stores'), get('cvs'), get('feedback'), get('schedule'), get('meta'), get('funnel').catch(() => []), get('ops').catch(() => []), get('inventory').catch(() => [])]);
-    D.funnel = funnel; D.ops = ops; D.inv = inv;
+    const [daily, sales, stores, cvs, feedback, sched, meta, funnel, ops, inv, panel] = await Promise.all([get('daily'), get('sales'), get('stores'), get('cvs'), get('feedback'), get('schedule'), get('meta'), get('funnel').catch(() => []), get('ops').catch(() => []), get('inventory').catch(() => []), get('panel').catch(() => [])]);
+    D.funnel = funnel; D.ops = ops; D.inv = inv; D.panel = panel;
     D.daily = daily; D.sales = decode(sales); D.stores = decode(stores); D.cvs = decode(cvs); D.feedback = feedback; D.sched = decode(sched); D.meta = meta;
     const addm = r => { r.월 = r.일자.slice(0, 7); r.연도 = r.일자.slice(0, 4); r.요일 = wday(r.일자); };
     D.daily.forEach(addm); D.sales.forEach(addm); D.stores.forEach(addm); D.cvs.forEach(addm); D.sched.forEach(addm);
@@ -223,6 +223,19 @@
     const withSales = daily.filter(r => r.MPOS != null);
     const first = I.filter(r => r.일자 === days[0]);
     dash.set('i_sum', [{ 기준일: last.일자.slice(5).replace('-', '/'), 마감: last.마감, 주간: last.주간마감, 야간: last.야간마감 || 0, 입고: sum(I.filter(r => r.입고 > 0 && !/이관/.test(r.비고)), r => r.입고), 입고횟수: new Set(I.filter(r => r.입고 > 0 && !/이관/.test(r.비고)).map(r => r.일자 + r.구분)).size, 시작: sum(first, r => r.전일), 소진: usedTot, MPOS: sum(withSales, r => r.MPOS), 판매: sum(withSales, r => r.판매), 차이: sum(withSales, r => r.차이), 차이일수: withSales.filter(r => r.차이 !== 0).length, 일수: withSales.length }]);
+    // 프런트 패널: 입고(panel.json, 색상별) vs 지급(판매 데이터의 패널 수량, 총수량만)
+    const P = D.panel || [];
+    if (P.length) {
+      const pin = new Map(); P.forEach(r => pin.set(r.일자, (pin.get(r.일자) || 0) + (+r.입고 || 0)));
+      const p0 = [...pin.keys()].sort()[0] || ''; const pout = new Map(); D.sales.forEach(r => { if (+r.패널 > 0 && r.일자 >= p0) pout.set(r.일자, (pout.get(r.일자) || 0) + +r.패널); });
+      const pdays = [...new Set([...pin.keys(), ...pout.keys()])].sort();
+      let bal = 0; const prows = pdays.map(d => { const i = pin.get(d) || 0, o = pout.get(d) || 0; bal += i - o; return { 일자: d, 입고: i, 지급: o, 잔여: bal, 지급건수: D.sales.filter(r => r.일자 === d && +r.패널 > 0).length, 비고: [...new Set(P.filter(r => r.일자 === d).map(r => r.비고).filter(Boolean))].join(' · ') }; });
+      dash.set('p_daily', prows.slice().reverse());
+      const tin = sum(P, r => r.입고), tout = sum([...pout.values()], v => v);
+      dash.set('p_sum', [{ 입고: tin, 지급: tout, 잔여: tin - tout, 입고횟수: new Set(P.map(r => r.일자)).size, 지급일수: pout.size, 마지막지급: pdays.length ? pdays[pdays.length - 1] : null }]);
+      const pasof = document.getElementById('p-asof'); if (pasof) pasof.textContent = pdays.length ? pdays[pdays.length - 1].slice(5).replace('-', '/') : '—';
+      dash.set('p_color', [...group(P, r => r.색상)].map(([c, g]) => ({ 색상: c, 입고: sum(g, r => r.입고), 비중: tin ? r1(sum(g, r => r.입고) / tin * 100) : null })).sort((a, b) => b.입고 - a.입고));
+    }
     const asof = document.getElementById('i-asof'); if (asof) asof.textContent = last.일자.slice(5).replace('-', '/');
     dash.set('i_color_daily', [...group(I, r => r.일자 + '|' + r.구분)].map(([k, g]) => { const o = { 일자: g[0].일자, 구분: g[0].구분, 소진: sum(g, r => r.소진), 마감: sum(g, r => r.마감) }; g.forEach(r => o[r.색상] = r.소진); return o; }).sort((a, b) => a.일자 < b.일자 ? 1 : a.일자 > b.일자 ? -1 : a.구분 < b.구분 ? -1 : 1));
   }

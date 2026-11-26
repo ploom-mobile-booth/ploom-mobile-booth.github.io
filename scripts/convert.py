@@ -122,7 +122,7 @@ DAILY = [("일자", [r"^날짜$", r"^Date$"]), ("운영구분", [r"운영 구분
 SALES = [("일자", [r"^날짜$", r"^Date$"]), ("운영구분", [r"운영 구분", r"주간/야간"]), ("시간", [r"판매 시간", r"Sales Time"]), ("구분", [r"점포 구분", r"^Store Type"]),
          ("코드", [r"점포 코드", r"Store Code"]), ("브랜드", [r"점포 타입", r"Store Chain"]), ("점포명", [r"^점포명", r"Store Name"]), ("경로", [r"판매 경로", r"Transaction"]),
          ("색상", [r"디바이스 컬러", r"디바이스 색상", r"Device Color"]), ("수량", [r"판매 수량", r"^Sales Qty"]), ("회원가입", [r"회원가입 여부", r"^Membership"]),
-         ("카카오", [r"카카오", r"^Kakao"]), ("기프트카드", [r"기프트카드 제공 수량", r"Gift Card"])]
+         ("카카오", [r"카카오", r"^Kakao"]), ("기프트카드", [r"기프트카드 제공 수량", r"Gift Card"]), ("패널", [r"프런트 패널", r"프론트 패널", r"Front Panel"])]
 STORES = [("일자", [r"^날짜$"]), ("시간대", [r"^시간$"]), ("구분", [r"점포 구분"]), ("코드", [r"점포 코드"]), ("브랜드", [r"점포 타입"]), ("점포명", [r"^점포명"]), ("판매", [r"^판매량"]), ("비고", [r"^비고"])]
 CVS = [("일자", [r"^날짜$"]), ("코드", [r"점포 코드"]), ("브랜드", [r"점포 타입"]), ("점포명", [r"^점포명"]), ("출고일", [r"출고 일자"]), ("출고", [r"출고 수량"]), ("반납일", [r"반납 일자"]), ("반납", [r"반납 수량"])]
 SCHED = [("팀", [r"^팀$"]), ("일자", [r"^날짜$"]), ("시간", [r"^시간$"]), ("신규", [r"^구분$"]), ("점포구분", [r"점포/흡연구역", r"^장소$"]),
@@ -147,9 +147,9 @@ def conv_sales(wb):
         out.append([d, hour(r.get("시간")), kind(r.get("구분")) if "구분" in col else None, code_of(r.get("코드"), r.get("점포명")), brand_by_code(r.get("코드"), brand(r.get("브랜드"))), s(r.get("점포명")) or None,
                     route(r.get("경로")), color(r.get("색상")), num(r.get("수량"), 1) or 1,
                     yn(r.get("회원가입"), "완료", "미완료") if "회원가입" in col else None, yn(r.get("카카오"), "완료", "미완료") if "카카오" in col else None,
-                    num(r.get("기프트카드"), 0) if "기프트카드" in col else None, s(r.get("운영구분")) or None])
+                    num(r.get("기프트카드"), 0) if "기프트카드" in col else None, s(r.get("운영구분")) or None, num(r.get("패널"), 0) if "패널" in col else None])
     return out
-SALES_COLS = ["일자", "시", "구분", "점포코드", "브랜드", "점포명", "경로", "색상", "수량", "회원가입", "카카오", "기프트카드", "운영구분"]
+SALES_COLS = ["일자", "시", "구분", "점포코드", "브랜드", "점포명", "경로", "색상", "수량", "회원가입", "카카오", "기프트카드", "운영구분", "패널"]
 
 def conv_stores(wb):
     ws = wb["프로그램 진행 완료 점포"]; col, h = header_map(ws, STORES, ["No."]); out = []

@@ -4,6 +4,7 @@
 새 날이 생기면 아래 ROWS 에 한 줄 추가하고 `py -3 scripts/inventory.py` 를 실행한다.
 
 한 줄 = (일자, 구분, [전일재고 4색], [입고 4색] 또는 None, [소진 4색], [마감 4색], 비고)
+프런트 패널 입고는 PANEL_IN 에 (일자, {색상: 수량}, 비고) 로 추가한다 → docs/data/panel.json
 색상 순서: 제트 블랙, 네이비 블루, 로즈 골드, 실버
 메일에 표가 없는 날(10/16, 10/23)은 앞뒤 마감 재고 차이로 소진을 계산했고 '추정'으로 표시한다.
 """
@@ -55,6 +56,15 @@ ROWS = [
     ("2026-11-25", D, [267, 108, 264, 499], None, [82, 65, 61, 37], [185, 43, 203, 462], "프런트 패널 1차 입고 397개 전량 소진"),
     ("2026-11-25", N, [57, 36, 29, 50], None, [6, 6, 5, 6], [51, 30, 24, 44], ""),
 ]
+# ---- 프런트 패널 입고 (색상별 총수량, 인력사 구분 없음). 지급은 판매 데이터의 Front Panel Qty 열(sales.json 패널)로 센다.
+PANEL_OUT = os.path.join(ROOT, "docs", "data", "panel.json")
+PANEL_IN = [
+    ("2026-11-20", {"블랙": 45, "블랙 (프리미엄)": 80, "블루": 44, "블루 (프리미엄)": 56, "실버": 79, "실버 (프리미엄)": 36, "아마존 그린": 8, "라벤더": 14, "오키드": 35}, "1차 입고 397개"),
+]
+panel = [{"일자": d, "색상": c, "입고": q, "비고": memo} for d, m, memo in PANEL_IN for c, q in m.items()]
+json.dump(panel, open(PANEL_OUT, "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
+print(f"panel.json: 입고 {len(PANEL_IN)}회 {sum(r['입고'] for r in panel)}개")
+
 out = []
 for d, k, prev, inc, used, close, memo in ROWS:
     inc = inc or [0, 0, 0, 0]

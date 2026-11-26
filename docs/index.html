@@ -247,6 +247,20 @@
     <div class="card" style="margin-top:var(--cds-gap-md)"><h3>색상별 일별 소진 (대)</h3>
       <div class="tw"><table data-source="i_color_daily"><thead><tr><th data-field="일자">일자</th><th data-field="구분">구분</th><th class="n" data-field="제트 블랙">제트 블랙</th><th class="n" data-field="네이비 블루">네이비 블루</th><th class="n" data-field="로즈 골드">로즈 골드</th><th class="n" data-field="실버">실버</th><th class="n" data-field="소진">소진 합</th><th class="n" data-field="마감">마감</th></tr></thead>
       <tbody data-draw="tbl" data-cols="일자,구분,제트 블랙,네이비 블루,로즈 골드,실버,소진,마감" data-fmts=",,,,,,,"></tbody></table></div></div>
+
+    <h2 style="margin-top:var(--cds-gap-lg)">프런트 패널</h2>
+    <div class="kpis">
+      <div class="kpi"><div class="k">패널 잔여</div><div class="v"><span data-draw="num" data-source="p_sum" data-field="잔여" data-row="0">—</span><span class="u">개</span></div><div class="s"><span id="p-asof">—</span> 기준 · 입고 <span data-draw="num" data-source="p_sum" data-field="입고" data-row="0">—</span> − 지급 <span data-draw="num" data-source="p_sum" data-field="지급" data-row="0">—</span></div><div class="ic p"><svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8M8 11h8M8 15h5"/></svg></div></div>
+      <div class="kpi"><div class="k">패널 입고 누계</div><div class="v"><span data-draw="num" data-source="p_sum" data-field="입고" data-row="0">—</span><span class="u">개</span></div><div class="s">입고 <span data-draw="num" data-source="p_sum" data-field="입고횟수" data-row="0">—</span>회</div><div class="ic g"><svg viewBox="0 0 24 24"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M4 20h16"/></svg></div></div>
+      <div class="kpi"><div class="k">패널 지급 누계</div><div class="v"><span data-draw="num" data-source="p_sum" data-field="지급" data-row="0">—</span><span class="u">개</span></div><div class="s">지급한 날 <span data-draw="num" data-source="p_sum" data-field="지급일수" data-row="0">—</span>일 (판매 데이터 기준)</div><div class="ic o"><svg viewBox="0 0 24 24"><path d="M4 17l5-6 4 4 7-8"/><path d="M16 7h4v4"/></svg></div></div>
+    </div>
+    <div class="grid2">
+      <div class="card"><h3>일별 패널 입고·지급·잔여 (개)</h3>
+        <div class="tw"><table data-source="p_daily"><thead><tr><th data-field="일자">일자</th><th class="n" data-field="입고">입고</th><th class="n" data-field="지급">지급</th><th class="n" data-field="지급건수">지급 건수</th><th class="n" data-field="잔여">잔여</th><th data-field="비고">비고</th></tr></thead>
+        <tbody data-draw="tbl" data-cols="일자,입고,지급,지급건수,잔여,비고" data-fmts=",,,,,"></tbody></table></div>
+        <p class="note">입고는 메일로 받은 색상별 수량을 손으로 옮긴 값이고, 지급은 판매 데이터 탭의 프런트 패널 지급 수량(Front Panel Qty)을 날짜별로 더한 값입니다. 지급 쪽에는 색상이 없어 잔여는 총수량으로만 셉니다.</p></div>
+      <div class="card"><h3>색상별 패널 입고 (개)</h3><div class="chart" data-draw="hbar" data-source="p_color" data-label="색상" data-value="입고" data-sub="비중" data-subfmt=".1f" data-subunit="%"></div></div>
+    </div>
   </div>
 
   <!-- 소비자 피드백 -->
@@ -279,6 +293,6 @@
 </div>
 
 <script src="dash.js?v=1"></script>
-<script src="app.js?v=9"></script>
+<script src="app.js?v=10"></script>
 </body>
 </html>
