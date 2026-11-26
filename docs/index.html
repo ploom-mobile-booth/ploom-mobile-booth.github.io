@@ -236,7 +236,7 @@
       <div class="kpi"><div class="k">소진 − MPOS 결제</div><div class="v"><span data-draw="num" data-source="i_sum" data-field="차이" data-row="0" data-fmt="+,">—</span><span class="u">대</span></div><div class="s">차이가 난 날 <span data-draw="num" data-source="i_sum" data-field="차이일수" data-row="0">—</span>일 / <span data-draw="num" data-source="i_sum" data-field="일수" data-row="0">—</span>일</div><div class="ic r"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg></div></div>
     </div>
     <div class="grid2">
-      <div class="card"><h3>일별 마감 재고 (대)</h3><div class="legend" data-source="i_daily"><span><i data-c="0"></i>주간</span><span><i data-c="1"></i>야간</span><span><i data-c="2"></i>합계</span></div><div class="chart" data-draw="line" data-source="i_daily" data-x="일자" data-y="주간마감,야간마감,마감" data-xfmt="date"></div><p class="note">10월 21일(1,920대)과 11월 11일(2,208대)에 입고, 11월 16일부터 야간 재고를 따로 셉니다. 11월 20일 주간 96대를 야간으로 옮겼습니다.</p></div>
+      <div class="card"><h3>일별 마감 재고 (대)</h3><div class="legend" data-source="i_daily"><span><i data-c="0"></i>주간</span><span><i data-c="1"></i>야간</span><span><i data-c="2"></i>합계</span></div><div class="chart" data-draw="line" data-source="i_daily" data-x="일자" data-y="주간마감,야간마감,마감" data-xfmt="date"></div><p class="note">9월 마감 4,776대로 시작해 10월 1일 DP(진열용) 220대 반출, 10월 21일(1,920대)과 11월 11일(2,208대)에 입고, 11월 16일부터 야간 재고를 따로 셉니다. 11월 20일 주간 96대를 야간으로 옮겼습니다.</p></div>
       <div class="card"><h3>최근 색상별 재고 (대)</h3><div class="legend" data-source="i_color"><span><i data-c="0"></i>주간</span><span><i data-c="1"></i>야간</span></div><div class="chart" data-draw="vbar" data-source="i_color" data-x="색상" data-y="주간,야간" data-grouped="1"></div>
         <div class="tw" style="margin-top:10px"><table data-source="i_color"><thead><tr><th data-field="색상">색상</th><th class="n" data-field="주간">주간</th><th class="n" data-field="야간">야간</th><th class="n" data-field="합계">합계</th><th class="n" data-field="소진누계">소진 누계</th><th class="n" data-field="비중">소진 비중 %</th></tr></thead><tbody data-draw="tbl" data-cols="색상,주간,야간,합계,소진누계,비중" data-fmts=",,,,,.1f"></tbody></table></div></div>
     </div>
@@ -310,6 +310,6 @@
 </div>
 
 <script src="dash.js?v=1"></script>
-<script src="app.js?v=10"></script>
+<script src="app.js?v=11"></script>
 </body>
 </html>
