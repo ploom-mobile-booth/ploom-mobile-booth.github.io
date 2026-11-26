@@ -261,6 +261,23 @@
         <p class="note">입고는 메일로 받은 색상별 수량을 손으로 옮긴 값이고, 지급은 판매 데이터 탭의 프런트 패널 지급 수량(Front Panel Qty)을 날짜별로 더한 값입니다. 지급 쪽에는 색상이 없어 잔여는 총수량으로만 셉니다.</p></div>
       <div class="card"><h3>색상별 패널 입고 (개)</h3><div class="chart" data-draw="hbar" data-source="p_color" data-label="색상" data-value="입고" data-sub="비중" data-subfmt=".1f" data-subunit="%"></div></div>
     </div>
+
+    <h2 style="margin-top:var(--cds-gap-lg)">MPOS 결제 내역 대조</h2>
+    <div class="kpis">
+      <div class="kpi"><div class="k">대조한 날</div><div class="v"><span data-draw="num" data-source="x_mpos_sum" data-field="일수" data-row="0">—</span><span class="u">일</span></div><div class="s">완전 일치 <span data-draw="num" data-source="x_mpos_sum" data-field="일치" data-row="0">—</span>일 · 색상만 다름 <span data-draw="num" data-source="x_mpos_sum" data-field="색상만" data-row="0">—</span>일 · 수량 다름 <span data-draw="num" data-source="x_mpos_sum" data-field="수량다름" data-row="0">—</span>일</div><div class="ic g"><svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-5"/><circle cx="12" cy="12" r="9"/></svg></div></div>
+      <div class="kpi"><div class="k">MPOS 승인 수량</div><div class="v"><span data-draw="num" data-source="x_mpos_sum" data-field="MPOS수량" data-row="0">—</span><span class="u">대</span></div><div class="s">리포트 MPOS 판매 <span data-draw="num" data-source="x_mpos_sum" data-field="리포트수량" data-row="0">—</span>대</div><div class="ic p"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18"/></svg></div></div>
+      <div class="kpi"><div class="k">수량 차이 (MPOS − 리포트)</div><div class="v"><span data-draw="num" data-source="x_mpos_sum" data-field="차이" data-row="0" data-fmt="+,">—</span><span class="u">대</span></div><div class="s">취소 <span data-draw="num" data-source="x_mpos_sum" data-field="취소" data-row="0">—</span>건 · 한쪽에만 있는 날 <span data-draw="num" data-source="x_mpos_sum" data-field="한쪽만" data-row="0">—</span>일</div><div class="ic o"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg></div></div>
+    </div>
+    <div class="grid2">
+      <div class="card"><h3>월별 대조 (대)</h3>
+        <div class="tw"><table data-source="x_mpos_month"><thead><tr><th data-field="월">월</th><th class="n" data-field="일수">일수</th><th class="n" data-field="MPOS수량">MPOS 승인</th><th class="n" data-field="리포트수량">리포트 MPOS</th><th class="n" data-field="차이">차이</th><th class="n" data-field="수량다름일">수량 다른 날</th><th class="n" data-field="색상다름일">색상 다른 날</th><th class="n" data-field="취소">취소</th></tr></thead>
+        <tbody data-draw="tbl" data-cols="월,일수,MPOS수량,리포트수량,차이,수량다름일,색상다름일,취소" data-fmts=",,,,+,,,"></tbody></table></div>
+        <p class="note">MPOS 승인은 결제 내역 파일에서 상태 성공·거래구분 승인인 건의 수량 합(개인 정보 없이 날짜별 집계만 사이트에 올림). 리포트 MPOS는 판매 데이터 탭에서 경로가 MPOS인 건의 수량 합. 건수는 한 사람이 여러 대를 사면 결제는 1건, 리포트는 여러 줄이라 달라질 수 있어 수량으로 비교합니다.</p></div>
+      <div class="card"><h3>일별 대조 (대)</h3>
+        <div class="tw"><table data-source="x_mpos_daily"><thead><tr><th data-field="일자">일자</th><th class="n" data-field="MPOS수량">MPOS 승인</th><th class="n" data-field="리포트수량">리포트 MPOS</th><th class="n" data-field="차이">차이</th><th class="n" data-field="소진">재고 소진</th><th class="n" data-field="취소">취소</th><th data-field="색상차이">색상 차이 (MPOS−리포트)</th><th data-field="상태">상태</th></tr></thead>
+        <tbody data-draw="tbl" data-cols="일자,MPOS수량,리포트수량,차이,소진,취소,색상차이,상태" data-fmts=",,,+,,,,"></tbody></table></div>
+        <p class="note">재고 소진은 메일 재고 표(10월 8일부터). 머리글을 누르면 정렬됩니다.</p></div>
+    </div>
   </div>
 
   <!-- 소비자 피드백 -->

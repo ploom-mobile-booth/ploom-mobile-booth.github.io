@@ -322,3 +322,9 @@ def conv_ops():
     print(f"  ops.json: {len(out)}달")
 
 conv_activation(); conv_ops()
+
+# ---------- MPOS 결제 내역 집계 (scripts/mpos.py) ----------
+try:
+    import mpos   # 읽으면서 바로 실행되어 docs/data/mpos.json 을 만든다
+except Exception as e:
+    print("mpos.json 건너뜀:", e)
