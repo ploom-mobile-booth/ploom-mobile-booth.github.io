@@ -40,8 +40,8 @@
   // ---------- 자료 읽기 ----------
   async function load() {
     const v = Date.now(), get = n => fetch('data/' + n + '.json?v=' + v).then(r => r.json());
-    const [daily, sales, stores, cvs, feedback, sched, meta, funnel, ops, inv, panel, mpos] = await Promise.all([get('daily'), get('sales'), get('stores'), get('cvs'), get('feedback'), get('schedule'), get('meta'), get('funnel').catch(() => []), get('ops').catch(() => []), get('inventory').catch(() => []), get('panel').catch(() => []), get('mpos').catch(() => [])]);
-    D.funnel = funnel; D.ops = ops; D.inv = inv; D.panel = panel; D.mpos = mpos;
+    const [daily, sales, stores, cvs, feedback, sched, meta, funnel, ops, inv, panel, mpos, gift] = await Promise.all([get('daily'), get('sales'), get('stores'), get('cvs'), get('feedback'), get('schedule'), get('meta'), get('funnel').catch(() => []), get('ops').catch(() => []), get('inventory').catch(() => []), get('panel').catch(() => []), get('mpos').catch(() => []), get('gift').catch(() => [])]);
+    D.funnel = funnel; D.ops = ops; D.inv = inv; D.panel = panel; D.mpos = mpos; D.gift = gift;
     D.daily = daily; D.sales = decode(sales); D.stores = decode(stores); D.cvs = decode(cvs); D.feedback = feedback; D.sched = decode(sched); D.meta = meta;
     const addm = r => { r.월 = r.일자.slice(0, 7); r.연도 = r.일자.slice(0, 4); r.요일 = wday(r.일자); };
     D.daily.forEach(addm); D.sales.forEach(addm); D.stores.forEach(addm); D.cvs.forEach(addm); D.sched.forEach(addm);
@@ -236,6 +236,20 @@
       dash.set('p_sum', [{ 입고: tin, 지급: tout, 잔여: tin - tout, 입고횟수: new Set(P.map(r => r.일자)).size, 지급일수: pout.size, 마지막지급: pdays.length ? pdays[pdays.length - 1] : null }]);
       const pasof = document.getElementById('p-asof'); if (pasof) pasof.textContent = pdays.length ? pdays[pdays.length - 1].slice(5).replace('-', '/') : '—';
       dash.set('p_color', [...group(P, r => r.색상)].map(([c, g]) => ({ 색상: c, 입고: sum(g, r => r.입고), 비중: tin ? r1(sum(g, r => r.입고) / tin * 100) : null })).sort((a, b) => b.입고 - a.입고));
+    }
+    // 스타벅스 기프트카드: 입고(gift.json) vs 사용(판매 데이터의 기프트카드 제공 수량)
+    const G = D.gift || [];
+    if (G.length) {
+      const gin = new Map(); G.forEach(r => gin.set(r.일자, (gin.get(r.일자) || 0) + (+r.입고 || 0)));
+      const g0 = [...gin.keys()].sort()[0] || '';
+      const gout = new Map(); D.sales.forEach(r => { if (+r.기프트카드 > 0 && r.일자 >= g0) gout.set(r.일자, (gout.get(r.일자) || 0) + +r.기프트카드); });
+      const gdays = [...new Set([...gin.keys(), ...gout.keys()])].sort();
+      let gb = 0; const grows = gdays.map(d => { const i = gin.get(d) || 0, o = gout.get(d) || 0; gb += i - o; return { 일자: d, 입고: i, 사용: o, 잔여: gb, 비고: [...new Set(G.filter(r => r.일자 === d).map(r => r.비고).filter(Boolean))].join(' · ') }; });
+      dash.set('g_daily', grows.slice().reverse());
+      const gtin = sum(G, r => r.입고), gtout = sum([...gout.values()], v => v);
+      dash.set('g_sum', [{ 입고: gtin, 사용: gtout, 잔여: gtin - gtout, 입고횟수: gin.size, 사용일수: gout.size }]);
+      const gasof = document.getElementById('g-asof'); if (gasof) gasof.textContent = gdays.length ? gdays[gdays.length - 1].slice(5).replace('-', '/') : '—';
+      dash.set('g_month', [...group(grows, r => r.일자.slice(0, 7))].map(([m, g]) => ({ 월: parseInt(m.slice(5)) + '월', 입고: sum(g, r => r.입고), 사용: sum(g, r => r.사용), 월말잔여: g[g.length - 1].잔여 })));
     }
     const asof = document.getElementById('i-asof'); if (asof) asof.textContent = last.일자.slice(5).replace('-', '/');
     dash.set('i_color_daily', [...group(I, r => r.일자 + '|' + r.구분)].map(([k, g]) => { const o = { 일자: g[0].일자, 구분: g[0].구분, 소진: sum(g, r => r.소진), 마감: sum(g, r => r.마감) }; g.forEach(r => o[r.색상] = r.소진); return o; }).sort((a, b) => a.일자 < b.일자 ? 1 : a.일자 > b.일자 ? -1 : a.구분 < b.구분 ? -1 : 1));

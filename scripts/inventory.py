@@ -5,6 +5,7 @@
 
 한 줄 = (일자, 구분, [전일재고 4색], [입고 4색] 또는 None, [소진 4색], [마감 4색], 비고)
 프런트 패널 입고는 PANEL_IN 에 (일자, {색상: 수량}, 비고) 로 추가한다 → docs/data/panel.json
+스타벅스 기프트카드 입고는 GIFT_IN 에 (일자, 수량, 비고) 로 추가한다 → docs/data/gift.json
 색상 순서: 제트 블랙, 네이비 블루, 로즈 골드, 실버
 메일에 표가 없는 날(10/16, 10/23)은 앞뒤 마감 재고 차이로 소진을 계산했고 '추정'으로 표시한다.
 """
@@ -70,6 +71,18 @@ PANEL_IN = [
 panel = [{"일자": d, "색상": c, "입고": q, "비고": memo} for d, m, memo in PANEL_IN for c, q in m.items()]
 json.dump(panel, open(PANEL_OUT, "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
 print(f"panel.json: 입고 {len(PANEL_IN)}회 {sum(r['입고'] for r in panel)}개")
+
+# ---- 스타벅스 기프트카드 입고 (장). 사용은 판매 데이터의 기프트카드 제공 수량(sales.json 기프트카드)으로 센다.
+GIFT_OUT = os.path.join(ROOT, "docs", "data", "gift.json")
+GIFT_IN = [
+    ("2026-10-01", 2855, "10월 시작 수량"),
+    ("2026-10-12", 6300, "추가 보충"),
+    ("2026-11-05", 2880, "입고"),
+    ("2026-11-20", 3750, "입고"),
+]
+gift = [{"일자": d, "입고": q, "비고": memo} for d, q, memo in GIFT_IN]
+json.dump(gift, open(GIFT_OUT, "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
+print(f"gift.json: 입고 {len(GIFT_IN)}회 {sum(r['입고'] for r in gift)}장")
 
 out = []
 for d, k, prev, inc, used, close, memo in ROWS:
