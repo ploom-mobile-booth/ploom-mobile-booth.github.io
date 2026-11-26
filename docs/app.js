@@ -40,8 +40,8 @@
   // ---------- 자료 읽기 ----------
   async function load() {
     const v = Date.now(), get = n => fetch('data/' + n + '.json?v=' + v).then(r => r.json());
-    const [daily, sales, stores, cvs, feedback, sched, meta, funnel, ops] = await Promise.all([get('daily'), get('sales'), get('stores'), get('cvs'), get('feedback'), get('schedule'), get('meta'), get('funnel').catch(() => []), get('ops').catch(() => [])]);
-    D.funnel = funnel; D.ops = ops;
+    const [daily, sales, stores, cvs, feedback, sched, meta, funnel, ops, inv] = await Promise.all([get('daily'), get('sales'), get('stores'), get('cvs'), get('feedback'), get('schedule'), get('meta'), get('funnel').catch(() => []), get('ops').catch(() => []), get('inventory').catch(() => [])]);
+    D.funnel = funnel; D.ops = ops; D.inv = inv;
     D.daily = daily; D.sales = decode(sales); D.stores = decode(stores); D.cvs = decode(cvs); D.feedback = feedback; D.sched = decode(sched); D.meta = meta;
     const addm = r => { r.월 = r.일자.slice(0, 7); r.연도 = r.일자.slice(0, 4); r.요일 = wday(r.일자); };
     D.daily.forEach(addm); D.sales.forEach(addm); D.stores.forEach(addm); D.cvs.forEach(addm); D.sched.forEach(addm);
@@ -158,6 +158,7 @@
     funnel();
     // 작년 비교
     compare();
+    inventory();
     markNoFilter(); dash.render();
   }
   let STORES = [];
@@ -204,6 +205,27 @@
   }
 
   // ---------- 작년 비교 ----------
+  // ---------- 디바이스 재고 (메일의 재고 표, 필터와 무관하게 전 기간) ----------
+  function inventory() {
+    const I = D.inv || []; if (!I.length) return;
+    const COLORS = ['제트 블랙', '네이비 블루', '로즈 골드', '실버'];
+    const days = [...new Set(I.map(r => r.일자))].sort();
+    const salesOf = new Map(); D.daily.forEach(r => salesOf.set(r.일자, (salesOf.get(r.일자) || 0) + (+r.판매 || 0)));
+    const daily = days.map(d => { const g = I.filter(r => r.일자 === d), dg = g.filter(r => r.구분 === '주간'), ng = g.filter(r => r.구분 === '야간');
+      const inc = sum(g, r => r.입고), used = sum(g, r => r.소진), close = sum(g, r => r.마감), prev = sum(g, r => r.전일), sales = salesOf.has(d) ? salesOf.get(d) : null;
+      const memo = [...new Set(g.map(r => r.비고).filter(Boolean))].join(' · ');
+      return { 일자: d, 전일: prev, 입고: inc, 소진: used, 마감: close, 주간마감: sum(dg, r => r.마감), 야간마감: ng.length ? sum(ng, r => r.마감) : null, 판매: sales, 차이: sales == null ? null : used - sales, 비고: memo }; });
+    dash.set('i_daily', daily);
+    const last = daily[daily.length - 1], lastG = I.filter(r => r.일자 === last.일자);
+    const usedTot = sum(I, r => r.소진);
+    dash.set('i_color', COLORS.map(c => { const dg = lastG.find(r => r.구분 === '주간' && r.색상 === c), ng = lastG.find(r => r.구분 === '야간' && r.색상 === c); const u = sum(I.filter(r => r.색상 === c), r => r.소진); return { 색상: c, 주간: dg ? dg.마감 : 0, 야간: ng ? ng.마감 : 0, 합계: (dg ? dg.마감 : 0) + (ng ? ng.마감 : 0), 소진누계: u, 비중: usedTot ? r1(u / usedTot * 100) : null }; }));
+    const withSales = daily.filter(r => r.판매 != null);
+    const first = I.filter(r => r.일자 === days[0]);
+    dash.set('i_sum', [{ 기준일: last.일자.slice(5).replace('-', '/'), 마감: last.마감, 주간: last.주간마감, 야간: last.야간마감 || 0, 입고: sum(I.filter(r => r.입고 > 0 && !/이관/.test(r.비고)), r => r.입고), 입고횟수: new Set(I.filter(r => r.입고 > 0 && !/이관/.test(r.비고)).map(r => r.일자 + r.구분)).size, 시작: sum(first, r => r.전일), 소진: usedTot, 판매: sum(withSales, r => r.판매), 차이: sum(withSales, r => r.차이), 차이일수: withSales.filter(r => r.차이 !== 0).length, 일수: withSales.length }]);
+    const asof = document.getElementById('i-asof'); if (asof) asof.textContent = last.일자.slice(5).replace('-', '/');
+    dash.set('i_color_daily', [...group(I, r => r.일자 + '|' + r.구분)].map(([k, g]) => { const o = { 일자: g[0].일자, 구분: g[0].구분, 소진: sum(g, r => r.소진), 마감: sum(g, r => r.마감) }; g.forEach(r => o[r.색상] = r.소진); return o; }).sort((a, b) => a.일자 < b.일자 ? 1 : a.일자 > b.일자 ? -1 : a.구분 < b.구분 ? -1 : 1));
+  }
+
   function compare() {
     const years = [...new Set(D.daily.map(r => r.연도))].sort(); if (years.length < 2) { $('cmp-range').textContent = '비교할 작년 자료가 없습니다.'; return; }
     const cur = years[years.length - 1], prev = years[years.length - 2];
