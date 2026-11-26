@@ -148,6 +148,9 @@ main.pl{max-width:none;margin:0;width:100%;box-sizing:border-box;padding:26px 32
 .pl .gate input,.pl .toolbar input{flex:1;padding:9px 12px;border:1px solid var(--color-border-line);border-radius:9px;font-size:14px;background:var(--color-panel);color:var(--color-fg)}
 .pl button{padding:9px 14px;border:0;border-radius:9px;background:var(--navy-2);color:#fff;font-size:13px;font-weight:600;cursor:pointer}
 .pl button.link{background:transparent;color:var(--color-fg-muted);font-weight:500;text-decoration:underline;padding:4px}
+.pl tr.more td{text-align:center;padding:6px 0 2px}
+.pl tr.more button.link{color:var(--navy-2);text-decoration:none;font-size:12px}
+.pl tr.more button.link:hover{text-decoration:underline}
 .pl .toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:14px;font-size:13px}
 .pl .toolbar label{display:flex;align-items:center;gap:6px;color:var(--color-fg-muted)}
 .pl .toolbar input[type=date]{padding:6px 10px}

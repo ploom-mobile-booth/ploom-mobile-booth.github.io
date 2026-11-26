@@ -46,7 +46,10 @@ const dash = (() => {
     if (!rows) return;
     const cols = tb.dataset.cols.split(','); const fmts = (tb.dataset.fmts || '').split(',');
     const keyCols = (table.dataset.rowKey || '').split(',');
-    rows.forEach(r => {
+    // 긴 표는 접어 둔다: data-limit 줄(기본 10)만 보이고, 버튼으로 전체 펼치기·접기
+    const limit = tb.dataset.limit != null ? +tb.dataset.limit : 10, open = tb.dataset.open === '1';
+    const shown = (limit > 0 && !open && rows.length > limit) ? rows.slice(0, limit) : rows;
+    shown.forEach(r => {
       const tr = document.createElement('tr');
       tr.dataset.key = keyCols.map(k => encodeURIComponent(String(r[k] ?? ''))).join(',');
       cols.forEach((c, i) => {
@@ -60,6 +63,13 @@ const dash = (() => {
       });
       tb.appendChild(tr);
     });
+    if (limit > 0 && rows.length > limit) {
+      const tr = document.createElement('tr'); tr.className = 'more'; const td = document.createElement('td'); td.colSpan = cols.length;
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'link';
+      b.textContent = open ? '접기 ▲' : `전체 ${rows.length}줄 보기 ▼ (${rows.length - limit}줄 더)`;
+      b.addEventListener('click', () => { tb.dataset.open = open ? '0' : '1'; dash.render(); if (open) table.scrollIntoView({ block: 'start', behavior: 'smooth' }); });
+      td.appendChild(b); tr.appendChild(td); tb.appendChild(tr);
+    }
   });
 
   function tipIn(el) {
