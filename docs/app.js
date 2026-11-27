@@ -40,8 +40,8 @@
   // ---------- 자료 읽기 ----------
   async function load() {
     const v = Date.now(), get = n => fetch('data/' + n + '.json?v=' + v).then(r => r.json());
-    const [daily, sales, stores, cvs, feedback, sched, meta, funnel, ops, inv, panel, mpos, gift] = await Promise.all([get('daily'), get('sales'), get('stores'), get('cvs'), get('feedback'), get('schedule'), get('meta'), get('funnel').catch(() => []), get('ops').catch(() => []), get('inventory').catch(() => []), get('panel').catch(() => []), get('mpos').catch(() => []), get('gift').catch(() => [])]);
-    D.funnel = funnel; D.ops = ops; D.inv = inv; D.panel = panel; D.mpos = mpos; D.gift = gift;
+    const [daily, sales, stores, cvs, feedback, sched, meta, funnel, ops, inv, panel, mpos, gift, devIn] = await Promise.all([get('daily'), get('sales'), get('stores'), get('cvs'), get('feedback'), get('schedule'), get('meta'), get('funnel').catch(() => []), get('ops').catch(() => []), get('inventory').catch(() => []), get('panel').catch(() => []), get('mpos').catch(() => []), get('gift').catch(() => []), get('device_in').catch(() => [])]);
+    D.funnel = funnel; D.ops = ops; D.inv = inv; D.panel = panel; D.mpos = mpos; D.gift = gift; D.deviceIn = devIn;
     D.daily = daily; D.sales = decode(sales); D.stores = decode(stores); D.cvs = decode(cvs); D.feedback = feedback; D.sched = decode(sched); D.meta = meta;
     const addm = r => { r.월 = r.일자.slice(0, 7); r.연도 = r.일자.slice(0, 4); r.요일 = wday(r.일자); };
     D.daily.forEach(addm); D.sales.forEach(addm); D.stores.forEach(addm); D.cvs.forEach(addm); D.sched.forEach(addm);
@@ -221,6 +221,13 @@
     const last = daily[daily.length - 1], lastG = I.filter(r => r.일자 === last.일자);
     const usedTot = sum(I, r => r.소진);
     dash.set('i_color', COLORS.map(c => { const dg = lastG.find(r => r.구분 === '주간' && r.색상 === c), ng = lastG.find(r => r.구분 === '야간' && r.색상 === c); const u = sum(I.filter(r => r.색상 === c), r => r.소진); return { 색상: c, 주간: dg ? dg.마감 : 0, 야간: ng ? ng.마감 : 0, 합계: (dg ? dg.마감 : 0) + (ng ? ng.마감 : 0), 소진누계: u, 비중: usedTot ? r1(u / usedTot * 100) : null }; }));
+    // 디바이스 입고 내역 (device_in.json): 날짜별 색상 열 + 합계
+    const DI = D.deviceIn || [];
+    if (DI.length) {
+      const rowsIn = [...group(DI, r => r.일자)].map(([d, g]) => { const o = { 일자: d, 합계: sum(g, r => r.입고), 비고: [...new Set(g.map(r => r.비고).filter(Boolean))].join(' · ') }; COLORS.forEach(c => o[c] = sum(g.filter(r => r.색상 === c), r => r.입고)); return o; }).sort((a, b) => a.일자 < b.일자 ? -1 : 1);
+      const tot = { 일자: '합계', 합계: sum(rowsIn, r => r.합계), 비고: '' }; COLORS.forEach(c => tot[c] = sum(rowsIn, r => r[c]));
+      dash.set('i_in', rowsIn.concat([tot]));
+    }
     const withSales = daily.filter(r => r.MPOS != null);
     const first = I.filter(r => r.일자 === days[0]);
     dash.set('i_sum', [{ 기준일: last.일자.slice(5).replace('-', '/'), 마감: last.마감, 주간: last.주간마감, 야간: last.야간마감 || 0, 입고: sum(I.filter(r => r.입고 > 0 && !/이관|반출|DP|환불/.test(r.비고)), r => r.입고), 입고횟수: new Set(I.filter(r => r.입고 > 0 && !/이관|반출|DP|환불/.test(r.비고)).map(r => r.일자 + r.구분)).size, 시작: sum(first, r => r.전일), 소진: usedTot, MPOS: sum(withSales, r => r.MPOS), 판매: sum(withSales, r => r.판매), 차이: sum(withSales, r => r.차이), 차이일수: withSales.filter(r => r.차이 !== 0).length, 일수: withSales.length }]);
@@ -251,7 +258,7 @@
       const gasof = document.getElementById('g-asof'); if (gasof) gasof.textContent = gdays.length ? gdays[gdays.length - 1].slice(5).replace('-', '/') : '—';
       dash.set('g_month', [...group(grows, r => r.일자.slice(0, 7))].map(([m, g]) => ({ 월: parseInt(m.slice(5)) + '월', 입고: sum(g, r => r.입고), 사용: sum(g, r => r.사용), 월말잔여: g[g.length - 1].잔여 })));
     }
-    const asof = document.getElementById('i-asof'); if (asof) asof.textContent = last.일자.slice(5).replace('-', '/');
+    const asof = document.getElementById('i-asof'); if (asof) asof.textContent = last.일자.slice(5).replace('-', '/'); const asof2 = document.getElementById('i-asof2'); if (asof2) asof2.textContent = last.일자.slice(5).replace('-', '/');
     dash.set('i_color_daily', [...group(I, r => r.일자 + '|' + r.구분)].map(([k, g]) => { const o = { 일자: g[0].일자, 구분: g[0].구분, 소진: sum(g, r => r.소진), 마감: sum(g, r => r.마감) }; g.forEach(r => o[r.색상] = r.소진); return o; }).sort((a, b) => a.일자 < b.일자 ? 1 : a.일자 > b.일자 ? -1 : a.구분 < b.구분 ? -1 : 1));
   }
 
