@@ -229,17 +229,17 @@
 
   <!-- 재고 관리 (디바이스·프런트 패널·기프트카드·MPOS 대조) -->
   <div class="panel" id="p-inventory" hidden>
-    <p class="note" style="margin:0 0 10px">위의 연도·월 필터는 일별 표와 일별 그래프에만 적용됩니다. 남은 수량·누계·월별 표는 항상 전 기간 기준입니다.</p>
-    <h3 style="margin-top:0">지금 남은 디바이스 (색상별, <span id="i-asof2">—</span> 마감 기준)</h3>
+    <p class="note" style="margin:0 0 10px">위의 연도·월 필터를 고르면 남은 수량·입고·소진 타일과 일별 표·그래프가 그 달 기준으로 바뀝니다. 입고 내역과 월별 표는 항상 전 기간입니다.</p>
+    <h3 style="margin-top:0"><span id="i-title">지금 남은 디바이스</span> (색상별, <span id="i-asof2">—</span> 마감 기준)</h3>
     <div class="kpis">
       <div class="kpi"><div class="k">제트 블랙</div><div class="v"><span data-draw="num" data-source="i_color" data-where="색상=제트 블랙" data-field="합계">—</span><span class="u">대</span></div><div class="s">주간 <span data-draw="num" data-source="i_color" data-where="색상=제트 블랙" data-field="주간">—</span> · 야간 <span data-draw="num" data-source="i_color" data-where="색상=제트 블랙" data-field="야간">—</span> · 소진 누계 <span data-draw="num" data-source="i_color" data-where="색상=제트 블랙" data-field="소진누계">—</span></div><div class="ic"><svg viewBox="0 0 24 24"><path d="M3 7l9-4 9 4v10l-9 4-9-4z"/><path d="M3 7l9 4 9-4M12 11v10"/></svg></div></div>
       <div class="kpi"><div class="k">네이비 블루</div><div class="v"><span data-draw="num" data-source="i_color" data-where="색상=네이비 블루" data-field="합계">—</span><span class="u">대</span></div><div class="s">주간 <span data-draw="num" data-source="i_color" data-where="색상=네이비 블루" data-field="주간">—</span> · 야간 <span data-draw="num" data-source="i_color" data-where="색상=네이비 블루" data-field="야간">—</span> · 소진 누계 <span data-draw="num" data-source="i_color" data-where="색상=네이비 블루" data-field="소진누계">—</span></div><div class="ic p"><svg viewBox="0 0 24 24"><path d="M3 7l9-4 9 4v10l-9 4-9-4z"/><path d="M3 7l9 4 9-4M12 11v10"/></svg></div></div>
       <div class="kpi"><div class="k">로즈 골드</div><div class="v"><span data-draw="num" data-source="i_color" data-where="색상=로즈 골드" data-field="합계">—</span><span class="u">대</span></div><div class="s">주간 <span data-draw="num" data-source="i_color" data-where="색상=로즈 골드" data-field="주간">—</span> · 야간 <span data-draw="num" data-source="i_color" data-where="색상=로즈 골드" data-field="야간">—</span> · 소진 누계 <span data-draw="num" data-source="i_color" data-where="색상=로즈 골드" data-field="소진누계">—</span></div><div class="ic o"><svg viewBox="0 0 24 24"><path d="M3 7l9-4 9 4v10l-9 4-9-4z"/><path d="M3 7l9 4 9-4M12 11v10"/></svg></div></div>
       <div class="kpi"><div class="k">루나 실버</div><div class="v"><span data-draw="num" data-source="i_color" data-where="색상=실버" data-field="합계">—</span><span class="u">대</span></div><div class="s">주간 <span data-draw="num" data-source="i_color" data-where="색상=실버" data-field="주간">—</span> · 야간 <span data-draw="num" data-source="i_color" data-where="색상=실버" data-field="야간">—</span> · 소진 누계 <span data-draw="num" data-source="i_color" data-where="색상=실버" data-field="소진누계">—</span></div><div class="ic g"><svg viewBox="0 0 24 24"><path d="M3 7l9-4 9 4v10l-9 4-9-4z"/><path d="M3 7l9 4 9-4M12 11v10"/></svg></div></div>
     </div>
-    <h3>전체 재고 흐름</h3>
+    <h3 id="i-title2">전체 재고 흐름</h3>
     <div class="kpis">
-      <div class="kpi"><div class="k">마감 재고 (최근)</div><div class="v"><span data-draw="num" data-source="i_sum" data-field="마감" data-row="0">—</span><span class="u">대</span></div><div class="s"><span id="i-asof">—</span> 기준 · 주간 <span data-draw="num" data-source="i_sum" data-field="주간" data-row="0">—</span> · 야간 <span data-draw="num" data-source="i_sum" data-field="야간" data-row="0">—</span></div><div class="ic p"><svg viewBox="0 0 24 24"><path d="M3 7l9-4 9 4v10l-9 4-9-4z"/><path d="M3 7l9 4 9-4M12 11v10"/></svg></div></div>
+      <div class="kpi"><div class="k" id="i-close-label">마감 재고 (최근)</div><div class="v"><span data-draw="num" data-source="i_sum" data-field="마감" data-row="0">—</span><span class="u">대</span></div><div class="s"><span id="i-asof">—</span> 기준 · 주간 <span data-draw="num" data-source="i_sum" data-field="주간" data-row="0">—</span> · 야간 <span data-draw="num" data-source="i_sum" data-field="야간" data-row="0">—</span></div><div class="ic p"><svg viewBox="0 0 24 24"><path d="M3 7l9-4 9 4v10l-9 4-9-4z"/><path d="M3 7l9 4 9-4M12 11v10"/></svg></div></div>
       <div class="kpi"><div class="k">입고 누계</div><div class="v"><span data-draw="num" data-source="i_sum" data-field="입고" data-row="0">—</span><span class="u">대</span></div><div class="s">시작 재고 <span data-draw="num" data-source="i_sum" data-field="시작" data-row="0">—</span>대 + 입고 <span data-draw="num" data-source="i_sum" data-field="입고횟수" data-row="0">—</span>회</div><div class="ic g"><svg viewBox="0 0 24 24"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M4 20h16"/></svg></div></div>
       <div class="kpi"><div class="k">소진 누계</div><div class="v"><span data-draw="num" data-source="i_sum" data-field="소진" data-row="0">—</span><span class="u">대</span></div><div class="s">같은 기간 MPOS 결제 <span data-draw="num" data-source="i_sum" data-field="MPOS" data-row="0">—</span>대 · 전체 판매 <span data-draw="num" data-source="i_sum" data-field="판매" data-row="0">—</span>대</div><div class="ic o"><svg viewBox="0 0 24 24"><path d="M4 17l5-6 4 4 7-8"/><path d="M16 7h4v4"/></svg></div></div>
       <div class="kpi"><div class="k">소진 − MPOS 결제</div><div class="v"><span data-draw="num" data-source="i_sum" data-field="차이" data-row="0" data-fmt="+,">—</span><span class="u">대</span></div><div class="s">차이가 난 날 <span data-draw="num" data-source="i_sum" data-field="차이일수" data-row="0">—</span>일 / <span data-draw="num" data-source="i_sum" data-field="일수" data-row="0">—</span>일</div><div class="ic r"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg></div></div>
@@ -362,6 +362,6 @@
 </div>
 
 <script src="dash.js?v=3"></script>
-<script src="app.js?v=21"></script>
+<script src="app.js?v=22"></script>
 </body>
 </html>

@@ -215,14 +215,16 @@
     const days = [...new Set(I.map(r => r.일자))].sort();
     const salesOf = new Map(); D.daily.forEach(r => salesOf.set(r.일자, (salesOf.get(r.일자) || 0) + (+r.판매 || 0)));
     const mposOf = new Map(); D.sales.forEach(r => { if (String(r.경로 || '').startsWith('MPOS')) mposOf.set(r.일자, (mposOf.get(r.일자) || 0) + (+r.수량 || 1)); });
-    const daily = days.map(d => { const g = I.filter(r => r.일자 === d), dg = g.filter(r => r.구분 === '주간'), ng = g.filter(r => r.구분 === '야간');
+    let daily = days.map(d => { const g = I.filter(r => r.일자 === d), dg = g.filter(r => r.구분 === '주간'), ng = g.filter(r => r.구분 === '야간');
       const inc = sum(g, r => r.입고), used = sum(g, r => r.소진), close = sum(g, r => r.마감), prev = sum(g, r => r.전일), sales = salesOf.has(d) ? salesOf.get(d) : null, mpos = mposOf.has(d) ? mposOf.get(d) : null;
       const memo = [...new Set(g.map(r => r.비고).filter(Boolean))].join(' · ');
       return { 일자: d, 전일: prev, 입고: inc, 소진: used, 마감: close, 주간마감: sum(dg, r => r.마감), 야간마감: ng.length ? sum(ng, r => r.마감) : null, MPOS: mpos, 판매: sales, 차이: mpos == null ? null : used - mpos, 비고: memo }; });
-    dash.set('i_daily', daily.filter(r => dayOk(r.일자)));
-    const last = daily[daily.length - 1], lastG = I.filter(r => r.일자 === last.일자);
-    const usedTot = sum(I, r => r.소진);
-    dash.set('i_color', COLORS.map(c => { const dg = lastG.find(r => r.구분 === '주간' && r.색상 === c), ng = lastG.find(r => r.구분 === '야간' && r.색상 === c); const u = sum(I.filter(r => r.색상 === c), r => r.소진); return { 색상: c, 주간: dg ? dg.마감 : 0, 야간: ng ? ng.마감 : 0, 합계: (dg ? dg.마감 : 0) + (ng ? ng.마감 : 0), 소진누계: u, 비중: usedTot ? r1(u / usedTot * 100) : null }; }));
+    // 고른 달이 있으면 타일(남은 수량·흐름)도 그 달 기준: 마감은 그 달 마지막 날, 입고·소진은 그 달 합
+    const dailyAll = daily; const IF = I.filter(r => dayOk(r.일자)).length ? I.filter(r => dayOk(r.일자)) : I; daily = dailyAll.filter(r => dayOk(r.일자)).length ? dailyAll.filter(r => dayOk(r.일자)) : dailyAll;
+    dash.set('i_daily', daily);
+    const last = daily[daily.length - 1], lastG = IF.filter(r => r.일자 === last.일자);
+    const usedTot = sum(IF, r => r.소진);
+    dash.set('i_color', COLORS.map(c => { const dg = lastG.find(r => r.구분 === '주간' && r.색상 === c), ng = lastG.find(r => r.구분 === '야간' && r.색상 === c); const u = sum(IF.filter(r => r.색상 === c), r => r.소진); return { 색상: c, 주간: dg ? dg.마감 : 0, 야간: ng ? ng.마감 : 0, 합계: (dg ? dg.마감 : 0) + (ng ? ng.마감 : 0), 소진누계: u, 비중: usedTot ? r1(u / usedTot * 100) : null }; }));
     // 디바이스 입고 내역 (device_in.json): 날짜별 색상 열 + 합계
     const DI = D.deviceIn || [];
     if (DI.length) {
@@ -245,8 +247,8 @@
       const sasof = document.getElementById('sm-asof'); if (sasof) sasof.textContent = SM.map(r => r.일자.slice(5).replace('-', '/')).join(' · ');
     }
     const withSales = daily.filter(r => r.MPOS != null);
-    const first = I.filter(r => r.일자 === days[0]);
-    dash.set('i_sum', [{ 기준일: last.일자.slice(5).replace('-', '/'), 마감: last.마감, 주간: last.주간마감, 야간: last.야간마감 || 0, 입고: sum(I.filter(r => r.입고 > 0 && !/이관|반출|DP|환불/.test(r.비고)), r => r.입고), 입고횟수: new Set(I.filter(r => r.입고 > 0 && !/이관|반출|DP|환불/.test(r.비고)).map(r => r.일자 + r.구분)).size, 시작: sum(first, r => r.전일), 소진: usedTot, MPOS: sum(withSales, r => r.MPOS), 판매: sum(withSales, r => r.판매), 차이: sum(withSales, r => r.차이), 차이일수: withSales.filter(r => r.차이 !== 0).length, 일수: withSales.length }]);
+    const first = IF.filter(r => r.일자 === daily[0].일자);
+    dash.set('i_sum', [{ 기준일: last.일자.slice(5).replace('-', '/'), 마감: last.마감, 주간: last.주간마감, 야간: last.야간마감 || 0, 입고: sum(IF.filter(r => r.입고 > 0 && !/이관|반출|DP|환불/.test(r.비고)), r => r.입고), 입고횟수: new Set(IF.filter(r => r.입고 > 0 && !/이관|반출|DP|환불/.test(r.비고)).map(r => r.일자 + r.구분)).size, 시작: sum(first, r => r.전일), 소진: usedTot, MPOS: sum(withSales, r => r.MPOS), 판매: sum(withSales, r => r.판매), 차이: sum(withSales, r => r.차이), 차이일수: withSales.filter(r => r.차이 !== 0).length, 일수: withSales.length }]);
     // 프런트 패널: 입고(panel.json, 색상별) vs 지급(판매 데이터의 패널 수량, 총수량만)
     const P = D.panel || [];
     if (P.length) {
@@ -284,7 +286,7 @@
       const gasof = document.getElementById('g-asof'); if (gasof) gasof.textContent = gdays.length ? gdays[gdays.length - 1].slice(5).replace('-', '/') : '—';
       dash.set('g_month', [...group(grows, r => r.일자.slice(0, 7))].map(([m, g]) => ({ 월: parseInt(m.slice(5)) + '월', 입고: sum(g, r => r.입고), 사용: sum(g, r => r.사용), 월말잔여: g[g.length - 1].잔여 })));
     }
-    const asof = document.getElementById('i-asof'); if (asof) asof.textContent = last.일자.slice(5).replace('-', '/'); const asof2 = document.getElementById('i-asof2'); if (asof2) asof2.textContent = last.일자.slice(5).replace('-', '/');
+    const asof = document.getElementById('i-asof'); if (asof) asof.textContent = last.일자.slice(5).replace('-', '/'); const asof2 = document.getElementById('i-asof2'); if (asof2) asof2.textContent = last.일자.slice(5).replace('-', '/'); const ttl = document.getElementById('i-title'); if (ttl) ttl.textContent = F.month ? mlabel(F.month) + ' 말 남은 디바이스' : '지금 남은 디바이스'; const ttl2 = document.getElementById('i-title2'); if (ttl2) ttl2.textContent = F.month ? mlabel(F.month) + ' 재고 흐름' : '전체 재고 흐름'; const kl = document.getElementById('i-close-label'); if (kl) kl.textContent = F.month ? '월말 마감 재고' : '마감 재고 (최근)';
     dash.set('i_color_daily', [...group(I, r => r.일자 + '|' + r.구분)].map(([k, g]) => { const o = { 일자: g[0].일자, 구분: g[0].구분, 소진: sum(g, r => r.소진), 마감: sum(g, r => r.마감) }; g.forEach(r => o[r.색상] = r.소진); return o; }).sort((a, b) => a.일자 < b.일자 ? 1 : a.일자 > b.일자 ? -1 : a.구분 < b.구분 ? -1 : 1).filter(r => dayOk(r.일자)));
   }
 
