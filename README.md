@@ -20,7 +20,7 @@
 - `funnel.json`: `세일즈 데이터\Raw Data\*RRP Activation Data*.xlsx` 의 "(Raw) Activation" 시트에서 Channel = Ploom Agent 행만 (가장 최근 파일). 새 파일이 오면 convert.py 를 다시 돌리면 된다.
 - `ops.json`: 내부 사이트(ploom-report)의 팀·일 활동 요약을 달별 평균으로만 옮긴 것(시작 시각·활동 시간·방문 점포). 팀 번호·이름은 없다.
 
-## 디바이스 재고 (메뉴 "디바이스 재고")
+## 재고 관리 (메뉴 "재고 관리": 디바이스·프런트 패널·기프트카드·MPOS 대조)
 
 - 출처: 데일리 리포트 메일의 [디바이스 재고] 표. 보고용 엑셀에는 없어서 메일을 보고 손으로 옮긴다.
 - 자료: `scripts/inventory.py` 의 `ROWS` 에 하루 한 줄(야간은 따로 한 줄)을 추가한 뒤 `py -3 scripts/inventory.py` 실행 → `docs/data/inventory.json`.

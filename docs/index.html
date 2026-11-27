@@ -30,7 +30,7 @@
     <a href="#mix" data-panel="p-mix" data-title="상품·고객" title="상품·고객"><svg viewBox="0 0 24 24"><path d="M6 7h12l1 13H5z"/><path d="M9 7V5a3 3 0 0 1 6 0v2"/></svg><span>상품·고객</span></a>
     <a href="#funnel" data-panel="p-funnel" data-title="활동 퍼널" title="활동 퍼널"><svg viewBox="0 0 24 24"><path d="M3 5h18l-7 8v6l-4-2v-4z"/></svg><span>활동 퍼널</span></a>
     <a href="#cvs" data-panel="p-cvs" data-title="CVS 차용" title="CVS 차용"><svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V4h8v3M3 12h18"/></svg><span>CVS 차용</span></a>
-    <a href="#inventory" data-panel="p-inventory" data-title="디바이스 재고" title="디바이스 재고"><svg viewBox="0 0 24 24"><path d="M3 7l9-4 9 4v10l-9 4-9-4z"/><path d="M3 7l9 4 9-4M12 11v10"/></svg><span>디바이스 재고</span></a>
+    <a href="#inventory" data-panel="p-inventory" data-title="재고 관리" title="재고 관리"><svg viewBox="0 0 24 24"><path d="M3 7l9-4 9 4v10l-9 4-9-4z"/><path d="M3 7l9 4 9-4M12 11v10"/></svg><span>재고 관리</span></a>
     <a href="#feedback" data-panel="p-feedback" data-title="소비자 피드백" title="소비자 피드백"><svg viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/></svg><span>소비자 피드백</span></a>
     <a href="#compare" data-panel="p-compare" data-title="작년 비교" title="작년 비교"><svg viewBox="0 0 24 24"><path d="M4 19V9"/><path d="M10 19V5"/><path d="M16 19v-8"/><path d="M22 19V3"/><path d="M2 19h21"/></svg><span>작년 비교</span></a>
   </nav>
@@ -227,7 +227,7 @@
       <tbody data-draw="tbl" data-cols="일자,점포명,브랜드,출고,반납,반납일,상태" data-fmts=",,,,,,"></tbody></table></div></div>
   </div>
 
-  <!-- 디바이스 재고 -->
+  <!-- 재고 관리 (디바이스·프런트 패널·기프트카드·MPOS 대조) -->
   <div class="panel" id="p-inventory" hidden>
     <div class="kpis">
       <div class="kpi"><div class="k">마감 재고 (최근)</div><div class="v"><span data-draw="num" data-source="i_sum" data-field="마감" data-row="0">—</span><span class="u">대</span></div><div class="s"><span id="i-asof">—</span> 기준 · 주간 <span data-draw="num" data-source="i_sum" data-field="주간" data-row="0">—</span> · 야간 <span data-draw="num" data-source="i_sum" data-field="야간" data-row="0">—</span></div><div class="ic p"><svg viewBox="0 0 24 24"><path d="M3 7l9-4 9 4v10l-9 4-9-4z"/><path d="M3 7l9 4 9-4M12 11v10"/></svg></div></div>
