@@ -293,8 +293,9 @@
       <div class="card"><h3>일별 패널 입고·지급·잔여 (개)</h3>
         <div class="tw"><table data-source="p_daily"><thead><tr><th data-field="일자">일자</th><th class="n" data-field="입고">입고</th><th class="n" data-field="지급">지급</th><th class="n" data-field="지급건수">지급 건수</th><th class="n" data-field="잔여">잔여</th><th data-field="비고">비고</th></tr></thead>
         <tbody data-draw="tbl" data-cols="일자,입고,지급,지급건수,잔여,비고" data-fmts=",,,,,"></tbody></table></div>
-        <p class="note">입고는 메일로 받은 색상별 수량을 손으로 옮긴 값이고, 지급은 판매 데이터 탭의 프런트 패널 지급 수량(Front Panel Qty)을 날짜별로 더한 값입니다. 지급 쪽에는 색상이 없어 잔여는 총수량으로만 셉니다.</p></div>
-      <div class="card"><h3>색상별 패널 입고 (개)</h3><div id="p-in-table" class="tw"></div><p class="note">입고일별 색상 수량. 지급은 판매 데이터에 총수량만 있어 색상별 잔여는 알 수 없습니다.</p></div>
+        <p class="note">입고는 메일로 받은 색상별 수량을 손으로 옮긴 값이고, 지급은 판매 데이터 탭의 프런트 패널 지급 수량(Front Panel Qty)을 날짜별로 더한 값입니다.</p></div>
+      <div class="card"><h3 id="p-out-title">일자별 색상별 패널 지급 (개)</h3><div id="p-out-table" class="tw"></div><p class="note">판매 데이터 탭의 Front Panel Color·Qty 를 날짜별로 더한 값입니다. 프리미엄 제트블랙·프리미엄 블랙은 "블랙 (프리미엄)"처럼 입고 표의 색상 이름으로 맞췄고, 위 연도·월 필터를 따릅니다.</p></div>
+      <div class="card"><h3>색상별 패널 입고·지급·잔여 (개)</h3><div id="p-in-table" class="tw"></div><p class="note">입고일별 색상 수량과, 첫 입고일 이후 지급을 뺀 색상별 잔여입니다 (전 기간).</p></div>
     </div>
 
     <h2 style="margin-top:var(--cds-gap-lg)">스타벅스 기프트카드</h2>
@@ -361,6 +362,6 @@
 </div>
 
 <script src="dash.js?v=3"></script>
-<script src="app.js?v=25"></script>
+<script src="app.js?v=26"></script>
 </body>
 </html>

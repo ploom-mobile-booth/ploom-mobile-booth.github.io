@@ -91,6 +91,32 @@ def color(v):
     t = re.sub(r"\s+", "", s(v))
     if not t or t == "-": return None
     return {"네이비블루": "네이비 블루", "슬레이트그레이": "슬레이트 그레이", "오라이토레드": "오라이토 레드", "아쿠아헤일로": "아쿠아 헤일로", "루나실버": "루나 실버", "제트블랙": "제트 블랙"}.get(t, t)
+PANEL_COLORS = ["블랙", "블랙 (프리미엄)", "블루", "블루 (프리미엄)", "실버", "실버 (프리미엄)", "라벤더", "오키드", "아마존 그린", "일렉트릭 민트", "글레이셔 화이트", "글레이셔 화이트 (패턴)"]
+def pcolor(v):
+    """판매 데이터의 프런트 패널 색상 표기를 inventory.py PANEL_IN 의 이름으로 맞춘다 (프리미엄 제트블랙 → 블랙 (프리미엄) 등)"""
+    t = re.sub(r"\s+", "", s(v))
+    if not t or t == "-": return None
+    prem = "프리미엄" in t; pat = "패턴" in t
+    base = ("블랙" if "블랙" in t else "블루" if "블루" in t else "실버" if "실버" in t else "라벤더" if "라벤더" in t else "오키드" if "오키드" in t
+            else "아마존 그린" if "그린" in t else "일렉트릭 민트" if "민트" in t else "글레이셔 화이트" if "화이트" in t else None)
+    if base is None: return s(v)
+    if pat and base == "글레이셔 화이트": return "글레이셔 화이트 (패턴)"
+    return base + (" (프리미엄)" if prem and base in ("블랙", "블루", "실버") else "")
+def panel_of(qty, colors):
+    """(총 지급 수량, "색상:수량|색상:수량"). 한 줄에 여러 색상이면 'A / B' 와 '1 / 1' 로 적혀 있다."""
+    qs = [q.strip() for q in s(qty).split("/")] if s(qty) and s(qty) != "-" else []
+    cs = [c.strip() for c in s(colors).split("/")] if s(colors) and s(colors) != "-" else []
+    nums = [num(q, 0) for q in qs]
+    tot = sum(nums)
+    if tot <= 0: return 0, None
+    if len(cs) == len(nums): pairs = list(zip(cs, nums))
+    elif len(cs) == 1: pairs = [(cs[0], tot)]
+    else: pairs = [(c, 1) for c in cs] if cs else []
+    agg = {}
+    for c, q in pairs:
+        if q <= 0: continue
+        k = pcolor(c) or "(없음)"; agg[k] = agg.get(k, 0) + q
+    return tot, "|".join(f"{k}:{q}" for k, q in agg.items()) or None
 def sido(addr):
     t = s(addr).split()
     if not t: return None
@@ -122,7 +148,8 @@ DAILY = [("일자", [r"^날짜$", r"^Date$"]), ("운영구분", [r"운영 구분
 SALES = [("일자", [r"^날짜$", r"^Date$"]), ("운영구분", [r"운영 구분", r"주간/야간"]), ("시간", [r"판매 시간", r"Sales Time"]), ("구분", [r"점포 구분", r"^Store Type"]),
          ("코드", [r"점포 코드", r"Store Code"]), ("브랜드", [r"점포 타입", r"Store Chain"]), ("점포명", [r"^점포명", r"Store Name"]), ("경로", [r"판매 경로", r"Transaction"]),
          ("색상", [r"디바이스 컬러", r"디바이스 색상", r"Device Color"]), ("수량", [r"판매 수량", r"^Sales Qty"]), ("회원가입", [r"회원가입 여부", r"^Membership"]),
-         ("카카오", [r"카카오", r"^Kakao"]), ("기프트카드", [r"기프트카드 제공 수량", r"Gift Card"]), ("패널", [r"프런트 패널", r"프론트 패널", r"Front Panel"])]
+         ("카카오", [r"카카오", r"^Kakao"]), ("기프트카드", [r"기프트카드 제공 수량", r"Gift Card"]), ("패널색상", [r"프런트 패널 (컬러|색상)", r"프론트 패널 (컬러|색상)", r"Front Panel Colou?r"]),
+         ("패널", [r"프런트 패널 (지급 )?수량", r"프론트 패널 (지급 )?수량", r"Front Panel Qty", r"프런트 패널", r"프론트 패널", r"Front Panel"])]
 STORES = [("일자", [r"^날짜$"]), ("시간대", [r"^시간$"]), ("구분", [r"점포 구분"]), ("코드", [r"점포 코드"]), ("브랜드", [r"점포 타입"]), ("점포명", [r"^점포명"]), ("판매", [r"^판매량"]), ("비고", [r"^비고"])]
 CVS = [("일자", [r"^날짜$"]), ("코드", [r"점포 코드"]), ("브랜드", [r"점포 타입"]), ("점포명", [r"^점포명"]), ("출고일", [r"출고 일자"]), ("출고", [r"출고 수량"]), ("반납일", [r"반납 일자"]), ("반납", [r"반납 수량"])]
 SCHED = [("팀", [r"^팀$"]), ("일자", [r"^날짜$"]), ("시간", [r"^시간$"]), ("신규", [r"^구분$"]), ("점포구분", [r"점포/흡연구역", r"^장소$"]),
@@ -147,9 +174,9 @@ def conv_sales(wb):
         out.append([d, hour(r.get("시간")), kind(r.get("구분")) if "구분" in col else None, code_of(r.get("코드"), r.get("점포명")), brand_by_code(r.get("코드"), brand(r.get("브랜드"))), s(r.get("점포명")) or None,
                     route(r.get("경로")), color(r.get("색상")), num(r.get("수량"), 1) or 1,
                     yn(r.get("회원가입"), "완료", "미완료") if "회원가입" in col else None, yn(r.get("카카오"), "완료", "미완료") if "카카오" in col else None,
-                    num(r.get("기프트카드"), 0) if "기프트카드" in col else None, s(r.get("운영구분")) or None, num(r.get("패널"), 0) if "패널" in col else None])
+                    num(r.get("기프트카드"), 0) if "기프트카드" in col else None, s(r.get("운영구분")) or None, *(panel_of(r.get("패널"), r.get("패널색상")) if "패널" in col else (None, None))])
     return out
-SALES_COLS = ["일자", "시", "구분", "점포코드", "브랜드", "점포명", "경로", "색상", "수량", "회원가입", "카카오", "기프트카드", "운영구분", "패널"]
+SALES_COLS = ["일자", "시", "구분", "점포코드", "브랜드", "점포명", "경로", "색상", "수량", "회원가입", "카카오", "기프트카드", "운영구분", "패널", "패널색상"]
 
 def conv_stores(wb):
     ws = wb["프로그램 진행 완료 점포"]; col, h = header_map(ws, STORES, ["No."]); out = []
@@ -258,7 +285,7 @@ for year, month, f, d in files:
     print(f"{ym} {os.path.basename(f)}: 일 {len(a)}, 판매 {len(b_)}건 {sum(r[8] for r in b_)}대, 점포일 {len(c)}, 차용 {len(e)}, 피드백 {len(g)}, 스케줄 {len(h)}")
 daily.sort(key=lambda r: r["일자"]); sales.sort(key=lambda r: (r[0], r[1] or 0))
 save("daily.json", daily)
-save("sales.json", pack(SALES_COLS, sales, ["일자", "구분", "점포코드", "브랜드", "점포명", "경로", "색상", "운영구분"]))
+save("sales.json", pack(SALES_COLS, sales, ["일자", "구분", "점포코드", "브랜드", "점포명", "경로", "색상", "운영구분", "패널색상"]))
 save("stores.json", pack(STORES_COLS, stores, ["일자", "시간대", "구분", "점포코드", "브랜드", "점포명"]))
 save("cvs.json", pack(CVS_COLS, cvs, ["일자", "점포코드", "브랜드", "점포명", "반납일"]))
 save("feedback.json", feedback)

@@ -249,11 +249,14 @@
     const withSales = daily.filter(r => r.MPOS != null);
     const first = IF.filter(r => r.일자 === daily[0].일자);
     dash.set('i_sum', [{ 기준일: last.일자.slice(5).replace('-', '/'), 마감: last.마감, 주간: last.주간마감, 야간: last.야간마감 || 0, 입고: sum(IF.filter(r => r.입고 > 0 && !/이관|반출|DP|환불/.test(r.비고)), r => r.입고), 입고횟수: new Set(IF.filter(r => r.입고 > 0 && !/이관|반출|DP|환불/.test(r.비고)).map(r => r.일자 + r.구분)).size, 시작: sum(first, r => r.전일), 소진: usedTot, MPOS: sum(withSales, r => r.MPOS), 판매: sum(withSales, r => r.판매), 차이: sum(withSales, r => r.차이), 차이일수: withSales.filter(r => r.차이 !== 0).length, 일수: withSales.length }]);
-    // 프런트 패널: 입고(panel.json, 색상별) vs 지급(판매 데이터의 패널 수량, 총수량만)
+    // 프런트 패널: 입고(panel.json, 색상별) vs 지급(판매 데이터의 Front Panel Color·Qty, 색상별)
     const P = D.panel || [];
     if (P.length) {
       const pin = new Map(); P.forEach(r => pin.set(r.일자, (pin.get(r.일자) || 0) + (+r.입고 || 0)));
-      const p0 = [...pin.keys()].sort()[0] || ''; const pout = new Map(); D.sales.forEach(r => { if (+r.패널 > 0 && r.일자 >= p0) pout.set(r.일자, (pout.get(r.일자) || 0) + +r.패널); });
+      const p0 = [...pin.keys()].sort()[0] || ''; const pout = new Map(), poutC = new Map(); // poutC: 일자 → Map(색상 → 수량)
+      D.sales.forEach(r => { if (+r.패널 > 0 && r.일자 >= p0) { pout.set(r.일자, (pout.get(r.일자) || 0) + +r.패널);
+        const m = poutC.get(r.일자) || new Map(); (r.패널색상 ? String(r.패널색상).split('|') : ['(색상 없음):' + r.패널]).forEach(kv => { const i = kv.lastIndexOf(':'); const c = kv.slice(0, i), q = +kv.slice(i + 1) || 0; m.set(c, (m.get(c) || 0) + q); }); poutC.set(r.일자, m); } });
+      const outByColor = new Map(); poutC.forEach(m => m.forEach((q, c) => outByColor.set(c, (outByColor.get(c) || 0) + q)));
       const pdays = [...new Set([...pin.keys(), ...pout.keys()])].sort();
       let bal = 0; const prows = pdays.map(d => { const i = pin.get(d) || 0, o = pout.get(d) || 0; bal += i - o; return { 일자: d, 입고: i, 지급: o, 잔여: bal, 지급건수: D.sales.filter(r => r.일자 === d && +r.패널 > 0).length, 비고: [...new Set(P.filter(r => r.일자 === d).map(r => r.비고).filter(Boolean))].join(' · ') }; });
       dash.set('p_daily', prows.filter(r => dayOk(r.일자)).reverse());
@@ -262,14 +265,24 @@
       const pasof = document.getElementById('p-asof'); if (pasof) pasof.textContent = pdays.length ? pdays[pdays.length - 1].slice(5).replace('-', '/') : '—';
       // 입고일별 × 색상별 표 (열 = 입고일, 행 = 색상)
       const pt = document.getElementById('p-in-table');
-      if (pt) { const dates = [...new Set(P.map(r => r.일자))].sort(); const colors = [...group(P, r => r.색상)].map(([c, g]) => ({ c, t: sum(g, r => r.입고) })).sort((a, b) => b.t - a.t);
-        const t = document.createElement('table'); const thead = document.createElement('thead'); const hr = document.createElement('tr');
-        ['색상', ...dates.map((d, i) => `${i + 1}차 ${d.slice(5).replace('-', '/')}`), '합계', '비중 %'].forEach((h, i) => { const th = document.createElement('th'); th.textContent = h; if (i) th.className = 'n'; hr.appendChild(th); });
+      const colors = [...new Set([...P.map(r => r.색상), ...outByColor.keys()])].map(c => ({ c, t: sum(P.filter(r => r.색상 === c), r => r.입고), o: outByColor.get(c) || 0 })).sort((a, b) => b.t - a.t || b.o - a.o);
+      const mkTable = (heads, rowsFn) => { const t = document.createElement('table'); const thead = document.createElement('thead'); const hr = document.createElement('tr');
+        heads.forEach((h, i) => { const th = document.createElement('th'); th.textContent = h; if (i) th.className = 'n'; hr.appendChild(th); });
         thead.appendChild(hr); t.appendChild(thead); const tb = document.createElement('tbody');
-        const addRow = (label, vals, bold) => { const tr = document.createElement('tr'); if (bold) tr.style.fontWeight = '600'; const td0 = document.createElement('td'); td0.textContent = label; tr.appendChild(td0); vals.forEach(v => { const td = document.createElement('td'); td.className = 'n'; td.textContent = v == null ? '' : (typeof v === 'number' ? d3.format(',')(v) : v); tr.appendChild(td); }); tb.appendChild(tr); };
-        colors.forEach(({ c, t: ct }) => addRow(c, [...dates.map(d => sum(P.filter(r => r.일자 === d && r.색상 === c), r => r.입고)), ct, tin ? r1(ct / tin * 100).toFixed(1) : '']));
-        addRow('합계', [...dates.map(d => sum(P.filter(r => r.일자 === d), r => r.입고)), tin, '100.0'], true);
-        t.appendChild(tb); pt.replaceChildren(t); }
+        const addRow = (label, vals, bold) => { const tr = document.createElement('tr'); if (bold) tr.style.fontWeight = '600'; const td0 = document.createElement('td'); td0.textContent = label; tr.appendChild(td0); vals.forEach(v => { const td = document.createElement('td'); td.className = 'n'; td.textContent = v == null ? '' : (typeof v === 'number' ? d3.format(',')(v) : v); if (typeof v === 'number' && v < 0) td.style.color = 'var(--red, #c0392b)'; tr.appendChild(td); }); tb.appendChild(tr); };
+        rowsFn(addRow); t.appendChild(tb); return t; };
+      if (pt) { const dates = [...new Set(P.map(r => r.일자))].sort();
+        pt.replaceChildren(mkTable(['색상', ...dates.map((d, i) => `${i + 1}차 ${d.slice(5).replace('-', '/')}`), '입고 합계', '지급', '잔여', '잔여 %'], addRow => {
+          colors.forEach(({ c, t: ct, o }) => addRow(c, [...dates.map(d => sum(P.filter(r => r.일자 === d && r.색상 === c), r => r.입고)), ct, o, ct - o, ct ? r1((ct - o) / ct * 100).toFixed(1) : '']));
+          addRow('합계', [...dates.map(d => sum(P.filter(r => r.일자 === d), r => r.입고)), tin, tout, tin - tout, tin ? r1((tin - tout) / tin * 100).toFixed(1) : ''], true); })); }
+      // 일자별 × 색상별 지급 표 (행 = 일자 최신순, 열 = 색상)
+      const po = document.getElementById('p-out-table');
+      if (po) { const odays = [...poutC.keys()].filter(dayOk).sort().reverse(); const oc = colors.filter(x => x.o > 0);
+        const title = document.getElementById('p-out-title'); if (title) title.textContent = (F.month ? mlabel(F.month) + ' ' : '') + '일자별 색상별 패널 지급 (개)';
+        if (!odays.length) { po.replaceChildren(Object.assign(document.createElement('p'), { className: 'note', textContent: '이 기간에는 패널 지급 기록이 없습니다.' })); }
+        else po.replaceChildren(mkTable(['일자', ...oc.map(x => x.c), '합계'], addRow => {
+          odays.forEach(d => { const m = poutC.get(d); addRow(d.slice(5).replace('-', '/'), [...oc.map(x => m.get(x.c) || 0), pout.get(d) || 0]); });
+          addRow('합계', [...oc.map(x => sum(odays, d => poutC.get(d).get(x.c) || 0)), sum(odays, d => pout.get(d) || 0)], true); })); }
       dash.set('p_color', [...group(P, r => r.색상)].map(([c, g]) => ({ 색상: c, 입고: sum(g, r => r.입고), 비중: tin ? r1(sum(g, r => r.입고) / tin * 100) : null })).sort((a, b) => b.입고 - a.입고));
     }
     // 스타벅스 기프트카드: 입고(gift.json) vs 사용(판매 데이터의 기프트카드 제공 수량)
