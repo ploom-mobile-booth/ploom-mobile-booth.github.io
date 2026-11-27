@@ -31,7 +31,8 @@ def run():
                 t = str(r[ix["거래일자"]] or "")
                 if not re.match(r"\d{4}-\d{2}-\d{2}", t): continue
                 day = t[:10]; ok = r[ix.get("상태")] == "성공" if "상태" in ix else True; tr = r[ix.get("거래구분")] if "거래구분" in ix else "승인"
-                q = r[ix["수량"]] or 0
+                q = r[ix["수량"]]
+                if q in (None, ""): q = 1   # 수량 칸이 빈 승인 줄(4/21 루나 실버 1건)은 1대로 센다
                 if ok and tr == "승인":
                     agg[day]["건수"] += 1; agg[day]["수량"] += q; agg[day]["금액"] += r[ix["승인금액"]] or 0 if "승인금액" in ix else 0
                     agg[day]["색:" + color(r[ix.get("상품")] if "상품" in ix else None)] += q
