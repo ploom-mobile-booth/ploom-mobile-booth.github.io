@@ -328,3 +328,7 @@ try:
     import mpos   # 읽으면서 바로 실행되어 docs/data/mpos.json 을 만든다
 except Exception as e:
     print("mpos.json 건너뜀:", e)
+try:
+    import sampling   # 무료 샘플링 결제 내역 → docs/data/sampling.json
+except Exception as e:
+    print("sampling.json 건너뜀:", e)

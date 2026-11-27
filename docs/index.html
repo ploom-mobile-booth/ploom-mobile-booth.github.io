@@ -255,10 +255,28 @@
     <div class="card" style="margin-top:var(--cds-gap-md)"><h3>디바이스 입고 내역 (대)</h3>
       <div class="tw"><table data-source="i_in"><thead><tr><th data-field="일자">일자</th><th data-field="구분">구분</th><th class="n" data-field="제트 블랙">제트 블랙</th><th class="n" data-field="네이비 블루">네이비 블루</th><th class="n" data-field="로즈 골드">로즈 골드</th><th class="n" data-field="실버">루나 실버</th><th class="n" data-field="합계">합계</th><th data-field="비고">비고</th></tr></thead>
       <tbody data-draw="tbl" data-cols="일자,구분,제트 블랙,네이비 블루,로즈 골드,실버,합계,비고" data-fmts=",,,,,,,"></tbody></table></div>
-      <p class="note">9월 30일 입고 2,391대는 9월 마감 재고 4,776대에 이미 들어 있어 위 입고 누계(10월 이후)에는 더하지 않습니다. 10월 21일 야간 샘플링용 1,500대는 판매 재고가 아니어서 위 재고 흐름과 입고 누계에는 넣지 않고 내역에만 적습니다. DP(진열용) 반출 220대와 야간 이관은 입고가 아니라 여기 넣지 않습니다.</p></div>
+      <p class="note">9월 30일 입고 2,391대는 9월 마감 재고 4,776대에 이미 들어 있어 위 입고 누계(10월 이후)에는 더하지 않습니다. 10월 21일 야간 프리샘플링용 1,500대는 판매 재고가 아니어서 위 재고 흐름과 입고 누계에는 넣지 않고 내역에만 적습니다. DP(진열용) 반출 220대와 야간 이관은 입고가 아니라 여기 넣지 않습니다.</p></div>
     <div class="card" style="margin-top:var(--cds-gap-md)"><h3>색상별 일별 소진 (대)</h3>
       <div class="tw"><table data-source="i_color_daily"><thead><tr><th data-field="일자">일자</th><th data-field="구분">구분</th><th class="n" data-field="제트 블랙">제트 블랙</th><th class="n" data-field="네이비 블루">네이비 블루</th><th class="n" data-field="로즈 골드">로즈 골드</th><th class="n" data-field="실버">실버</th><th class="n" data-field="소진">소진 합</th><th class="n" data-field="마감">마감</th></tr></thead>
       <tbody data-draw="tbl" data-cols="일자,구분,제트 블랙,네이비 블루,로즈 골드,실버,소진,마감" data-fmts=",,,,,,,"></tbody></table></div></div>
+
+    <h2 style="margin-top:var(--cds-gap-lg)">야간 프리샘플링 (100원 결제)</h2>
+    <div class="kpis">
+      <div class="kpi"><div class="k">프리샘플링 잔여</div><div class="v"><span data-draw="num" data-source="sm_sum" data-field="잔여" data-row="0">—</span><span class="u">대</span></div><div class="s">입고 <span data-draw="num" data-source="sm_sum" data-field="입고" data-row="0">—</span> − 판매 <span data-draw="num" data-source="sm_sum" data-field="판매" data-row="0">—</span></div><div class="ic p"><svg viewBox="0 0 24 24"><path d="M3 7l9-4 9 4v10l-9 4-9-4z"/><path d="M3 7l9 4 9-4M12 11v10"/></svg></div></div>
+      <div class="kpi"><div class="k">프리샘플링 판매</div><div class="v"><span data-draw="num" data-source="sm_sum" data-field="판매" data-row="0">—</span><span class="u">대</span></div><div class="s"><span id="sm-asof">—</span> · <span data-draw="num" data-source="sm_sum" data-field="건수" data-row="0">—</span>건 · 취소 <span data-draw="num" data-source="sm_sum" data-field="취소" data-row="0">—</span>건</div><div class="ic g"><svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-5"/><circle cx="12" cy="12" r="9"/></svg></div></div>
+      <div class="kpi"><div class="k">프리샘플링 결제 금액</div><div class="v"><span data-draw="num" data-source="sm_sum" data-field="금액" data-row="0">—</span><span class="u">원</span></div><div class="s">1대 100원 · 프리샘플링 MPOS 결제 내역 기준</div><div class="ic o"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18"/></svg></div></div>
+    </div>
+    <div class="grid2">
+      <div class="card"><h3>색상별 입고·판매 (대)</h3>
+        <div class="tw"><table data-source="sm_color"><thead><tr><th data-field="색상">색상</th><th class="n" data-field="입고">입고</th><th class="n" data-field="판매">판매</th><th class="n" data-field="잔여">잔여</th></tr></thead>
+        <tbody data-draw="tbl" data-cols="색상,입고,판매,잔여" data-fmts=",,,"></tbody></table></div>
+        <p class="note">입고는 디바이스 입고 내역의 "야간 (프리샘플링)" 줄, 판매는 야간 프리샘플링 MPOS 결제 내역(상태 성공·거래구분 승인)의 수량 합입니다.</p></div>
+      <div class="card"><h3>일별 프리샘플링 판매 (대)</h3>
+        <div class="tw"><table data-source="sm_daily"><thead><tr><th data-field="일자">일자</th><th class="n" data-field="제트 블랙">제트 블랙</th><th class="n" data-field="네이비 블루">네이비 블루</th><th class="n" data-field="로즈 골드">로즈 골드</th><th class="n" data-field="실버">루나 실버</th><th class="n" data-field="수량">합계</th><th class="n" data-field="건수">건수</th><th class="n" data-field="금액">금액</th><th class="n" data-field="잔여">잔여</th></tr></thead>
+        <tbody data-draw="tbl" data-cols="일자,제트 블랙,네이비 블루,로즈 골드,실버,수량,건수,금액,잔여" data-fmts=",,,,,,,,"></tbody></table></div>
+        <h3 style="margin-top:12px">활동 지역별 프리샘플링 판매 (대)</h3><div class="chart" data-draw="hbar" data-source="sm_region" data-label="지역" data-value="수량" data-sub="비중" data-subfmt=".1f" data-subunit="%"></div>
+        <p class="note">활동 지역은 10월 22일 결제 내역에만 적혀 있어 그날 분만 집계됩니다.</p></div>
+    </div>
 
     <h2 style="margin-top:var(--cds-gap-lg)">프런트 패널</h2>
     <div class="kpis">
@@ -338,6 +356,6 @@
 </div>
 
 <script src="dash.js?v=3"></script>
-<script src="app.js?v=14"></script>
+<script src="app.js?v=15"></script>
 </body>
 </html>

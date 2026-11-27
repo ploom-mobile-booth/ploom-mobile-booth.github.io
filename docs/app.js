@@ -40,8 +40,8 @@
   // ---------- 자료 읽기 ----------
   async function load() {
     const v = Date.now(), get = n => fetch('data/' + n + '.json?v=' + v).then(r => r.json());
-    const [daily, sales, stores, cvs, feedback, sched, meta, funnel, ops, inv, panel, mpos, gift, devIn] = await Promise.all([get('daily'), get('sales'), get('stores'), get('cvs'), get('feedback'), get('schedule'), get('meta'), get('funnel').catch(() => []), get('ops').catch(() => []), get('inventory').catch(() => []), get('panel').catch(() => []), get('mpos').catch(() => []), get('gift').catch(() => []), get('device_in').catch(() => [])]);
-    D.funnel = funnel; D.ops = ops; D.inv = inv; D.panel = panel; D.mpos = mpos; D.gift = gift; D.deviceIn = devIn;
+    const [daily, sales, stores, cvs, feedback, sched, meta, funnel, ops, inv, panel, mpos, gift, devIn, sampling] = await Promise.all([get('daily'), get('sales'), get('stores'), get('cvs'), get('feedback'), get('schedule'), get('meta'), get('funnel').catch(() => []), get('ops').catch(() => []), get('inventory').catch(() => []), get('panel').catch(() => []), get('mpos').catch(() => []), get('gift').catch(() => []), get('device_in').catch(() => []), get('sampling').catch(() => [])]);
+    D.funnel = funnel; D.ops = ops; D.inv = inv; D.panel = panel; D.mpos = mpos; D.gift = gift; D.deviceIn = devIn; D.sampling = sampling;
     D.daily = daily; D.sales = decode(sales); D.stores = decode(stores); D.cvs = decode(cvs); D.feedback = feedback; D.sched = decode(sched); D.meta = meta;
     const addm = r => { r.월 = r.일자.slice(0, 7); r.연도 = r.일자.slice(0, 4); r.요일 = wday(r.일자); };
     D.daily.forEach(addm); D.sales.forEach(addm); D.stores.forEach(addm); D.cvs.forEach(addm); D.sched.forEach(addm);
@@ -227,6 +227,20 @@
       const rowsIn = [...group(DI, r => r.일자 + '|' + r.구분)].map(([k, g]) => { const d = g[0].일자; const o = { 일자: d, 구분: g[0].구분, 합계: sum(g, r => r.입고), 비고: [...new Set(g.map(r => r.비고).filter(Boolean))].join(' · ') }; COLORS.forEach(c => o[c] = sum(g.filter(r => r.색상 === c), r => r.입고)); return o; }).sort((a, b) => a.일자 < b.일자 ? -1 : a.일자 > b.일자 ? 1 : a.구분 < b.구분 ? 1 : -1);
       const tot = { 일자: '합계', 구분: '', 합계: sum(rowsIn, r => r.합계), 비고: '' }; COLORS.forEach(c => tot[c] = sum(rowsIn, r => r[c]));
       dash.set('i_in', rowsIn.concat([tot]));
+    }
+    // 야간 프리샘플링: 입고(device_in 의 샘플링용) vs 샘플링 MPOS 승인(sampling.json)
+    const SM = D.sampling || [];
+    if (SM.length) {
+      const sin = DI.filter(r => /샘플링/.test(r.구분 || '') || /샘플링/.test(r.비고 || ''));
+      const inC = {}; COLORS.forEach(c => inC[c] = sum(sin.filter(r => r.색상 === c), r => r.입고));
+      const outC = {}; COLORS.forEach(c => outC[c] = sum(SM, r => (r.색상 || {})[c] || 0));
+      const tin = sum(Object.values(inC), v => v), tout = sum(SM, r => r.수량);
+      dash.set('sm_sum', [{ 입고: tin, 판매: tout, 잔여: tin - tout, 건수: sum(SM, r => r.건수), 금액: sum(SM, r => r.금액), 일수: SM.length, 취소: sum(SM, r => r.취소), 첫날: SM[0].일자, 끝날: SM[SM.length - 1].일자 }]);
+      dash.set('sm_color', COLORS.map(c => ({ 색상: c, 입고: inC[c], 판매: outC[c], 잔여: inC[c] - outC[c] })));
+      let bal = tin; dash.set('sm_daily', SM.map(r => { bal -= r.수량; const o = { 일자: r.일자, 건수: r.건수, 수량: r.수량, 금액: r.금액, 잔여: bal, 취소: r.취소 }; COLORS.forEach(c => o[c] = (r.색상 || {})[c] || 0); return o; }).reverse());
+      const reg = {}; SM.forEach(r => Object.entries(r.지역 || {}).forEach(([k, v]) => reg[k] = (reg[k] || 0) + v));
+      dash.set('sm_region', Object.entries(reg).map(([k, v]) => ({ 지역: k, 수량: v, 비중: tout ? r1(v / tout * 100) : null })).sort((a, b) => b.수량 - a.수량));
+      const sasof = document.getElementById('sm-asof'); if (sasof) sasof.textContent = SM.map(r => r.일자.slice(5).replace('-', '/')).join(' · ');
     }
     const withSales = daily.filter(r => r.MPOS != null);
     const first = I.filter(r => r.일자 === days[0]);
