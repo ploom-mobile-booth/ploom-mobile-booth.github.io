@@ -309,7 +309,15 @@
     const mt = { 월: '합계', 합계: sum(mrows, r => r.합계), 건수: sum(mrows, r => r.건수) }; MC.forEach(c => mt[c] = sum(mrows, r => r[c]));
     const mtot = mt.합계 || 1; MC.forEach(c => mt[c + ' %'] = r1(mt[c] / mtot * 100));
     const mp = { 월: '비중 %', 합계: 100, 건수: null }; MC.forEach(c => mp[c] = r1(mt[c] / mtot * 100));
-    dash.set('x_mpos_color_month', mrows.concat([mt, mp]));
+    if (F.month) {
+      // 달을 고르면 그 달의 일자별 색상 판매로
+      const drows = M.filter(r => r.일자.slice(0, 7) === F.month).map(r => { const o = { 월: r.일자, 합계: r.수량, 건수: r.건수 }; MC.forEach(c => o[c] = (r.색상 || {})[c] || 0); return o; });
+      const dt = { 월: '합계', 합계: sum(drows, r => r.합계), 건수: sum(drows, r => r.건수) }; MC.forEach(c => dt[c] = sum(drows, r => r[c]));
+      const dtot = dt.합계 || 1; const dp = { 월: '비중 %', 합계: 100, 건수: null }; MC.forEach(c => dp[c] = r1(dt[c] / dtot * 100));
+      dash.set('x_mpos_color_month', drows.concat([dt, dp]));
+    } else dash.set('x_mpos_color_month', mrows.concat([mt, mp]));
+    const cmT = document.getElementById('cm-title'); if (cmT) cmT.textContent = F.month ? mlabel(F.month) + ' 일자별 색상별 판매 (대)' : '월별 색상별 판매 (대)';
+    const cmH = document.getElementById('cm-head'); if (cmH) cmH.textContent = F.month ? '일자' : '월';
     dash.set('x_mpos_color_chart', mrows);
     dash.set('x_mpos_color_tot', MC.map(c => ({ 색상: c, 판매: mt[c], 비중: r1(mt[c] / mtot * 100) })));
     dash.set('x_mpos_daily', rows.filter(r => dayOk(r.일자)).reverse());

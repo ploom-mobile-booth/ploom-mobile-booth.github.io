@@ -245,10 +245,10 @@
       <div class="kpi"><div class="k">소진 − MPOS 결제</div><div class="v"><span data-draw="num" data-source="i_sum" data-field="차이" data-row="0" data-fmt="+,">—</span><span class="u">대</span></div><div class="s">차이가 난 날 <span data-draw="num" data-source="i_sum" data-field="차이일수" data-row="0">—</span>일 / <span data-draw="num" data-source="i_sum" data-field="일수" data-row="0">—</span>일</div><div class="ic r"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg></div></div>
     </div>
     <h3>디바이스 판매 (MPOS 결제 기준, 월별 × 색상별)</h3>
-    <div class="card"><h3>월별 색상별 판매 (대)</h3>
-        <div class="tw"><table data-source="x_mpos_color_month"><thead><tr><th data-field="월">월</th><th class="n" data-field="제트 블랙">제트 블랙</th><th class="n" data-field="네이비 블루">네이비 블루</th><th class="n" data-field="로즈 골드">로즈 골드</th><th class="n" data-field="루나 실버">루나 실버</th><th class="n" data-field="합계">합계</th><th class="n" data-field="건수">결제 건수</th></tr></thead>
-        <tbody data-draw="tbl" data-cols="월,제트 블랙,네이비 블루,로즈 골드,루나 실버,합계,건수" data-fmts=",,,,,,"></tbody></table></div>
-        <p class="note">MPOS 결제 내역에서 상태 성공·거래구분 승인인 건의 수량 합(4월부터). 취소 건은 뺀 값이며, CVS 쿠폰 판매는 들어 있지 않습니다.</p></div>
+    <div class="card"><h3 id="cm-title">월별 색상별 판매 (대)</h3>
+        <div class="tw"><table data-source="x_mpos_color_month"><thead><tr><th data-field="월" id="cm-head">월</th><th class="n" data-field="제트 블랙">제트 블랙</th><th class="n" data-field="네이비 블루">네이비 블루</th><th class="n" data-field="로즈 골드">로즈 골드</th><th class="n" data-field="루나 실버">루나 실버</th><th class="n" data-field="합계">합계</th><th class="n" data-field="건수">결제 건수</th></tr></thead>
+        <tbody data-draw="tbl" data-limit="0" data-cols="월,제트 블랙,네이비 블루,로즈 골드,루나 실버,합계,건수" data-fmts=",,,,,,"></tbody></table></div>
+        <p class="note">위에서 월을 고르면 그 달의 일자별 표로 바뀝니다. MPOS 결제 내역에서 상태 성공·거래구분 승인인 건의 수량 합(4월부터). 취소 건은 뺀 값이며, CVS 쿠폰 판매는 들어 있지 않습니다.</p></div>
     <h3>재고 흐름 그래프</h3>
     <div class="grid2">
       <div class="card"><h3>일별 마감 재고 (대)</h3><div class="legend" data-source="i_daily"><span><i data-c="0"></i>주간</span><span><i data-c="1"></i>야간</span><span><i data-c="2"></i>합계</span></div><div class="chart" data-draw="line" data-source="i_daily" data-x="일자" data-y="주간마감,야간마감,마감" data-xfmt="date"></div><p class="note">9월 마감 4,776대로 시작해 10월 1일 DP(진열용) 220대 반출, 10월 21일(1,920대)과 11월 11일(2,208대)에 입고, 11월 16일부터 야간 재고를 따로 셉니다. 11월 20일 주간 96대를 야간으로 옮겼습니다.</p></div>
@@ -362,6 +362,6 @@
 </div>
 
 <script src="dash.js?v=3"></script>
-<script src="app.js?v=22"></script>
+<script src="app.js?v=23"></script>
 </body>
 </html>
