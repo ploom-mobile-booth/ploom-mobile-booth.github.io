@@ -224,8 +224,8 @@
     // 디바이스 입고 내역 (device_in.json): 날짜별 색상 열 + 합계
     const DI = D.deviceIn || [];
     if (DI.length) {
-      const rowsIn = [...group(DI, r => r.일자)].map(([d, g]) => { const o = { 일자: d, 합계: sum(g, r => r.입고), 비고: [...new Set(g.map(r => r.비고).filter(Boolean))].join(' · ') }; COLORS.forEach(c => o[c] = sum(g.filter(r => r.색상 === c), r => r.입고)); return o; }).sort((a, b) => a.일자 < b.일자 ? -1 : 1);
-      const tot = { 일자: '합계', 합계: sum(rowsIn, r => r.합계), 비고: '' }; COLORS.forEach(c => tot[c] = sum(rowsIn, r => r[c]));
+      const rowsIn = [...group(DI, r => r.일자 + '|' + r.구분)].map(([k, g]) => { const d = g[0].일자; const o = { 일자: d, 구분: g[0].구분, 합계: sum(g, r => r.입고), 비고: [...new Set(g.map(r => r.비고).filter(Boolean))].join(' · ') }; COLORS.forEach(c => o[c] = sum(g.filter(r => r.색상 === c), r => r.입고)); return o; }).sort((a, b) => a.일자 < b.일자 ? -1 : a.일자 > b.일자 ? 1 : a.구분 < b.구분 ? 1 : -1);
+      const tot = { 일자: '합계', 구분: '', 합계: sum(rowsIn, r => r.합계), 비고: '' }; COLORS.forEach(c => tot[c] = sum(rowsIn, r => r[c]));
       dash.set('i_in', rowsIn.concat([tot]));
     }
     const withSales = daily.filter(r => r.MPOS != null);

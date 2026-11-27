@@ -23,7 +23,7 @@
 ## 재고 관리 (메뉴 "재고 관리": 디바이스·프런트 패널·기프트카드·MPOS 대조)
 
 - 출처: 데일리 리포트 메일의 [디바이스 재고] 표. 보고용 엑셀에는 없어서 메일을 보고 손으로 옮긴다.
-- 디바이스 입고 내역은 `scripts/inventory.py` 의 DEVICE_IN 에 (일자, {색상: 수량}, 비고) 로 추가 → docs/data/device_in.json. 10월 이후 입고는 ROWS 의 입고 칸에도 넣어야 한다.
+- 디바이스 입고 내역은 `scripts/inventory.py` 의 DEVICE_IN 에 (일자, 구분, {색상: 수량}, 비고) 로 추가 → docs/data/device_in.json. 10월 이후 입고는 ROWS 의 입고 칸에도 넣어야 한다.
 - 자료: `scripts/inventory.py` 의 `ROWS` 에 하루 한 줄(야간은 따로 한 줄)을 추가한 뒤 `py -3 scripts/inventory.py` 실행 → `docs/data/inventory.json`.
   한 줄 = (일자, 주간/야간, [전일 4색], [입고 4색] 또는 None, [소진 4색], [마감 4색], 비고). 색상 순서는 제트 블랙·네이비 블루·로즈 골드·실버.
   실행하면 전일+입고−소진=마감이 안 맞는 줄을 알려 준다.
