@@ -256,6 +256,16 @@
       const tin = sum(P, r => r.입고), tout = sum([...pout.values()], v => v);
       dash.set('p_sum', [{ 입고: tin, 지급: tout, 잔여: tin - tout, 입고횟수: new Set(P.map(r => r.일자)).size, 지급일수: pout.size, 마지막지급: pdays.length ? pdays[pdays.length - 1] : null }]);
       const pasof = document.getElementById('p-asof'); if (pasof) pasof.textContent = pdays.length ? pdays[pdays.length - 1].slice(5).replace('-', '/') : '—';
+      // 입고일별 × 색상별 표 (열 = 입고일, 행 = 색상)
+      const pt = document.getElementById('p-in-table');
+      if (pt) { const dates = [...new Set(P.map(r => r.일자))].sort(); const colors = [...group(P, r => r.색상)].map(([c, g]) => ({ c, t: sum(g, r => r.입고) })).sort((a, b) => b.t - a.t);
+        const t = document.createElement('table'); const thead = document.createElement('thead'); const hr = document.createElement('tr');
+        ['색상', ...dates.map((d, i) => `${i + 1}차 ${d.slice(5).replace('-', '/')}`), '합계', '비중 %'].forEach((h, i) => { const th = document.createElement('th'); th.textContent = h; if (i) th.className = 'n'; hr.appendChild(th); });
+        thead.appendChild(hr); t.appendChild(thead); const tb = document.createElement('tbody');
+        const addRow = (label, vals, bold) => { const tr = document.createElement('tr'); if (bold) tr.style.fontWeight = '600'; const td0 = document.createElement('td'); td0.textContent = label; tr.appendChild(td0); vals.forEach(v => { const td = document.createElement('td'); td.className = 'n'; td.textContent = v == null ? '' : (typeof v === 'number' ? d3.format(',')(v) : v); tr.appendChild(td); }); tb.appendChild(tr); };
+        colors.forEach(({ c, t: ct }) => addRow(c, [...dates.map(d => sum(P.filter(r => r.일자 === d && r.색상 === c), r => r.입고)), ct, tin ? r1(ct / tin * 100).toFixed(1) : '']));
+        addRow('합계', [...dates.map(d => sum(P.filter(r => r.일자 === d), r => r.입고)), tin, '100.0'], true);
+        t.appendChild(tb); pt.replaceChildren(t); }
       dash.set('p_color', [...group(P, r => r.색상)].map(([c, g]) => ({ 색상: c, 입고: sum(g, r => r.입고), 비중: tin ? r1(sum(g, r => r.입고) / tin * 100) : null })).sort((a, b) => b.입고 - a.입고));
     }
     // 스타벅스 기프트카드: 입고(gift.json) vs 사용(판매 데이터의 기프트카드 제공 수량)
