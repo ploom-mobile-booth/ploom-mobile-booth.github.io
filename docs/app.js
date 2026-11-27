@@ -40,8 +40,8 @@
   // ---------- 자료 읽기 ----------
   async function load() {
     const v = Date.now(), get = n => fetch('data/' + n + '.json?v=' + v).then(r => r.json());
-    const [daily, sales, stores, cvs, feedback, sched, meta, funnel, ops, inv, panel, mpos, gift, devIn, sampling] = await Promise.all([get('daily'), get('sales'), get('stores'), get('cvs'), get('feedback'), get('schedule'), get('meta'), get('funnel').catch(() => []), get('ops').catch(() => []), get('inventory').catch(() => []), get('panel').catch(() => []), get('mpos').catch(() => []), get('gift').catch(() => []), get('device_in').catch(() => []), get('sampling').catch(() => [])]);
-    D.funnel = funnel; D.ops = ops; D.inv = inv; D.panel = panel; D.mpos = mpos; D.gift = gift; D.deviceIn = devIn; D.sampling = sampling;
+    const [daily, sales, stores, cvs, feedback, sched, meta, funnel, ops, inv, panel, mpos, gift, devIn, sampling, solo] = await Promise.all([get('daily'), get('sales'), get('stores'), get('cvs'), get('feedback'), get('schedule'), get('meta'), get('funnel').catch(() => []), get('ops').catch(() => []), get('inventory').catch(() => []), get('panel').catch(() => []), get('mpos').catch(() => []), get('gift').catch(() => []), get('device_in').catch(() => []), get('sampling').catch(() => []), get('solo').catch(() => [])]);
+    D.funnel = funnel; D.ops = ops; D.inv = inv; D.panel = panel; D.mpos = mpos; D.gift = gift; D.deviceIn = devIn; D.sampling = sampling; D.solo = solo;
     D.daily = daily; D.sales = decode(sales); D.stores = decode(stores); D.cvs = decode(cvs); D.feedback = feedback; D.sched = decode(sched); D.meta = meta;
     const addm = r => { r.월 = r.일자.slice(0, 7); r.연도 = r.일자.slice(0, 4); r.요일 = wday(r.일자); };
     D.daily.forEach(addm); D.sales.forEach(addm); D.stores.forEach(addm); D.cvs.forEach(addm); D.sched.forEach(addm);
@@ -375,6 +375,39 @@
   }
 
   // ---------- 화면 전환 ----------
+
+  // ---------- 1인 근무 분석 (solo.json: 보고용 리포트만 사용, 필터 무관) ----------
+  function soloPanel() {
+    const M = D.solo || []; if (!M.length) { $('so-note').textContent = '1인 근무 표시가 있는 달의 자료가 없습니다.'; return; }
+    const m = M.find(o => o.월 === F.month) || M[M.length - 1];
+    const md = s => s ? s.slice(5).replace('-', '/') : '';
+    const h = v => v == null ? '—' : (Math.floor(v) + '시 ' + String(Math.round((v % 1) * 60)).padStart(2, '0') + '분');
+    $('so-month').textContent = mlabel(m.월); $('so-win').textContent = md(m.비교시작) + '~' + md(m.비교끝);
+    $('so-range').textContent = '판매 데이터 탭에 팀 번호가 있는 ' + md(m.비교시작) + '~' + md(m.비교끝) + ' (' + m.비교일수 + '일)만 비교하고, ' + (m.팀없는날.length ? '팀 번호가 없는 ' + md(m.팀없는날[0]) + '~' + md(m.팀없는날[m.팀없는날.length - 1]) + '은 뺐습니다. ' : '') + '야간 제외. 1인 팀은 ' + m.일인인력사.join('·') + ' 소속 ' + m.일인팀수 + '개 팀입니다.';
+    const one = m.같은인력사.find(x => x.유형 === '1인') || {}, two = m.같은인력사.find(x => x.유형 === '2인') || {}, twoAll = m.전체.find(x => x.유형 === '2인') || {};
+    const f2 = v => v == null ? '—' : d3.format('.2f')(v), f1 = v => v == null ? '—' : d3.format('.1f')(v);
+    $('so-k1').textContent = f2(one.배정당판매); $('so-k1b').textContent = f2(two.배정당판매); $('so-k1c').textContent = two.배정당판매 ? Math.round(one.배정당판매 / two.배정당판매 * 100) : '—';
+    $('so-k2').textContent = f2(one.인당배정); $('so-k2b').textContent = f2(two.인당배정); $('so-k2c').textContent = two.인당배정 ? Math.round((one.인당배정 / two.인당배정 - 1) * 100) : '—';
+    const tot = (m.배정['1인'] || 0) + (m.배정['2인'] || 0); $('so-k3').textContent = d3.format(',')(m.배정['1인'] || 0); $('so-k3b').textContent = tot ? f1((m.배정['1인'] || 0) / tot * 100) : '—'; $('so-k3c').textContent = m.일인팀수;
+    $('so-k4').textContent = f1(one.판매발생비율); $('so-k4b').textContent = f1(two.판매발생비율); $('so-k4c').textContent = f1(one.오대이상); $('so-k4d').textContent = f1(two.오대이상);
+    $('so-k5').textContent = f1(one.회원가입율); $('so-k5b').textContent = f1(two.회원가입율); $('so-k5c').textContent = f1(one.기재비율); $('so-k5d').textContent = f1(two.기재비율);
+    const pm = (m.시간대별 || []).filter(r => r.시 >= 13); $('so-k6').textContent = f1(sum(pm, r => r.일인비중)); $('so-k6b').textContent = f1(sum(pm, r => r.이인비중)); $('so-k6c').textContent = h(one.마지막판매); $('so-k6d').textContent = h(two.마지막판매);
+    const rows = [['배정 팀·일', '배정', v => d3.format(',')(v)], ['판매 발생 팀·일', '판매발생', v => d3.format(',')(v)], ['판매 발생 비율 %', '판매발생비율', f1], ['판매 합계 (대)', '판매', v => d3.format(',')(v)],
+      ['배정 팀·일당 판매', '배정당판매', f2], ['판매 발생 팀·일당 판매', '발생당판매', f2], ['인당 판매 (배정 기준)', '인당배정', f2], ['인당 판매 (판매 발생 기준)', '인당발생', f2], ['중앙값 (판매 발생)', '중앙값', f1],
+      ['3대 이상 비율 % (판매 발생)', '삼대이상', f1], ['5대 이상 비율 % (판매 발생)', '오대이상', f1], ['하루 최대 (대)', '최대', v => v], ['MPOS 현장 결제 비중 %', 'MPOS비중', f1], ['회원가입 완료 % (기재 건)', '회원가입율', f1], ['카카오 친구추가 % (기재 건)', '카카오율', f1],
+      ['회원가입 항목 기재 비율 %', '기재비율', f1], ['복수 구매 건 비율 %', '복수구매', f1], ['기프트카드 / 판매 1대', '기프트', f2], ['프런트 패널 / 판매 1대', '패널', f2], ['흡연구역 판매 비중 %', '흡연구역비중', f1],
+      ['활동 시작 (판매 발생 팀·일)', '활동시작', h], ['활동 종료', '활동종료', h], ['활동 시간 (시간)', '활동시간', f1], ['첫 판매', '첫판매', h], ['마지막 판매', '마지막판매', h]];
+    dash.set('so_main', rows.map(([k, f, fmt]) => ({ 지표: k, '1인': one[f] == null ? '—' : fmt(one[f]), '2인': two[f] == null ? '—' : fmt(two[f]), '2인전체': twoAll[f] == null ? '—' : fmt(twoAll[f]) })));
+    dash.set('so_calc', m.인력환산 || []); dash.set('so_ci', m.신뢰구간 || []);
+    dash.set('so_agency', m.인력사별 || []); dash.set('so_dist', m.분포 || []);
+    dash.set('so_week', (m.주차별 || []).map(r => ({ 주차: r.주차 + '주', '1인배정': r['1인배정'], '1인평균': r['1인평균'], '2인배정': r['2인배정'], '2인평균': r['2인평균'], 비율: r['2인평균'] ? r['1인평균'] / r['2인평균'] * 100 : null })));
+    dash.set('so_day', (m.일별 || []).filter(r => r.일자 >= m.비교시작).map(r => ({ 일자: r.일자, '1인배정': r['1인배정'], '1인판매': r['1인판매'], '1인평균': r['1인평균'], '2인배정': r['2인배정'], '2인판매': r['2인판매'], '2인평균': r['2인평균'] })).reverse());
+    const seg = []; (m.요일별 || []).forEach(r => seg.push({ 구분: '요일', 항목: r.요일, ...r })); (m.지점별 || []).forEach(r => seg.push({ 구분: '지점', 항목: r.지점, ...r })); (m.신규기존 || []).forEach(r => seg.push({ 구분: '시작점포', 항목: r.구분 + ' 점포', ...r }));
+    dash.set('so_seg', seg.map(r => ({ 구분: r.구분, 항목: r.항목, '1인배정': r['1인배정'], '1인평균': r['1인평균'], '2인배정': r['2인배정'], '2인평균': r['2인평균'], '2인인당': r['2인인당'] })));
+    dash.set('so_hour', m.시간대별 || []);
+    const sh = []; (m.점포유형 || []).forEach(r => sh.push({ 구분: '점포 유형', 항목: r.구분, 일인: r.일인, 이인: r.이인 })); (m.브랜드 || []).forEach(r => sh.push({ 구분: '브랜드', 항목: r.브랜드, 일인: r.일인, 이인: r.이인 })); (m.색상 || []).forEach(r => sh.push({ 구분: '색상', 항목: r.색상, 일인: r.일인, 이인: r.이인 }));
+    dash.set('so_share', sh); dash.set('so_rank', m.팀순위 || []);
+  }
   function showPanel() {
     const id = (location.hash || '#overview').slice(1);
     const a = document.querySelector('#tabs a[href="#' + id + '"]') || document.querySelector('#tabs a');
@@ -384,5 +417,5 @@
   }
   addEventListener('hashchange', showPanel);
 
-  load().then(() => { buildBar(); apply(); setupSubTabs(); showPanel(); }).catch(e => { console.error(e); $('badge').textContent = '자료를 읽지 못했습니다'; });
+  load().then(() => { buildBar(); apply(); soloPanel(); setupSubTabs(); showPanel(); }).catch(e => { console.error(e); $('badge').textContent = '자료를 읽지 못했습니다'; });
 })();

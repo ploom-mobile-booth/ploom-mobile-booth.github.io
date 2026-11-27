@@ -31,6 +31,7 @@
     <a href="#funnel" data-panel="p-funnel" data-title="활동 퍼널" title="활동 퍼널"><svg viewBox="0 0 24 24"><path d="M3 5h18l-7 8v6l-4-2v-4z"/></svg><span>활동 퍼널</span></a>
     <a href="#cvs" data-panel="p-cvs" data-title="CVS 차용" title="CVS 차용"><svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V4h8v3M3 12h18"/></svg><span>CVS 차용</span></a>
     <a href="#inventory" data-panel="p-inventory" data-title="재고 관리" title="재고 관리"><svg viewBox="0 0 24 24"><path d="M3 7l9-4 9 4v10l-9 4-9-4z"/><path d="M3 7l9 4 9-4M12 11v10"/></svg><span>재고 관리</span></a>
+    <a href="#solo" data-panel="p-solo" data-title="1인 근무 분석" title="1인 근무 분석"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0"/><circle cx="17" cy="9" r="2.5"/><path d="M14.5 20a4.5 4.5 0 0 1 7 0"/></svg><span>1인 근무 분석</span></a>
     <a href="#feedback" data-panel="p-feedback" data-title="소비자 피드백" title="소비자 피드백"><svg viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/></svg><span>소비자 피드백</span></a>
     <a href="#compare" data-panel="p-compare" data-title="작년 비교" title="작년 비교"><svg viewBox="0 0 24 24"><path d="M4 19V9"/><path d="M10 19V5"/><path d="M16 19v-8"/><path d="M22 19V3"/><path d="M2 19h21"/></svg><span>작년 비교</span></a>
   </nav>
@@ -262,8 +263,8 @@
       <tbody data-draw="tbl" data-cols="일자,전일,입고,소진,마감,주간마감,야간마감,MPOS,차이,판매,비고" data-fmts=",,,,,,,,+,,,"></tbody></table></div>
       <p class="note">출처는 데일리 리포트 메일의 디바이스 재고 표(10월 8일부터)이며 매일 메일을 받은 뒤 손으로 옮깁니다. 10월 16일·23일은 메일에 표가 없어 앞뒤 마감 재고 차이로 소진을 계산했습니다(추정). 10월 14일 시작 재고는 전날 마감보다 로즈 골드 36대가 적게 적혀 있습니다. 재고 소진은 MPOS 결제 수량과 맞춰 봅니다(판매 데이터 탭에서 경로가 MPOS인 건의 수량 합). 전체 판매는 데일리 리포트 탭의 판매 수로, CVS 쿠폰 판매 등이 더해져 소진보다 많습니다. 11월 20일 입고 0은 주간→야간 이관(−96/+96)이라 합계에 변화가 없습니다.</p></div>
     <div class="card" style="margin-top:var(--cds-gap-md)"><h3>디바이스 입고 내역 (대, 2026년 3월부터)</h3>
-      <div class="tw"><table data-source="i_in" data-limit="0"><thead><tr><th data-field="일자">일자</th><th data-field="구분">구분</th><th class="n" data-field="제트 블랙">제트 블랙</th><th class="n" data-field="네이비 블루">네이비 블루</th><th class="n" data-field="로즈 골드">로즈 골드</th><th class="n" data-field="실버">루나 실버</th><th class="n" data-field="합계">합계</th><th data-field="비고">비고</th></tr></thead>
-      <tbody data-draw="tbl" data-cols="일자,구분,제트 블랙,네이비 블루,로즈 골드,실버,합계,비고" data-fmts=",,,,,,,"></tbody></table></div>
+      <div class="tw"><table data-source="i_in"><thead><tr><th data-field="일자">일자</th><th data-field="구분">구분</th><th class="n" data-field="제트 블랙">제트 블랙</th><th class="n" data-field="네이비 블루">네이비 블루</th><th class="n" data-field="로즈 골드">로즈 골드</th><th class="n" data-field="실버">루나 실버</th><th class="n" data-field="합계">합계</th><th data-field="비고">비고</th></tr></thead>
+      <tbody data-draw="tbl" data-limit="0" data-cols="일자,구분,제트 블랙,네이비 블루,로즈 골드,실버,합계,비고" data-fmts=",,,,,,,"></tbody></table></div>
       <p class="note">3~9월 줄은 "디바이스 입고 현황" 정리 파일(브리드 창고 입고, 진열용 DP 포함) 기준이고, 위 재고 흐름은 10월 1일부터라 입고 누계에는 들어가지 않습니다. 9월 30일 입고 2,391대는 9월 마감 재고 4,776대에 이미 들어 있어 위 입고 누계(10월 이후)에는 더하지 않습니다. 10월 21일 야간 프리샘플링용 1,500대는 판매 재고가 아니어서 위 재고 흐름과 입고 누계에는 넣지 않고 내역에만 적습니다. DP(진열용) 반출 220대와 야간 이관은 입고가 아니라 여기 넣지 않습니다.</p></div>
 
     <h2 style="margin-top:var(--cds-gap-lg)">야간 프리샘플링 (100원 결제)</h2>
@@ -333,6 +334,56 @@
   </div>
 
   <!-- 소비자 피드백 -->
+  <!-- 1인 근무 분석 (보고용 리포트만 사용) -->
+  <div class="panel" id="p-solo" hidden>
+    <p class="note" style="margin-bottom:var(--cds-gap-md)" id="so-note">보고용 리포트의 스케줄 탭("1인 근무" 표시)과 판매 데이터 탭만으로 만든 비교입니다. 상단 필터와 무관하게 <span id="so-month">—</span> 자료를 보여 줍니다. <span id="so-range"></span></p>
+    <h3>핵심 비교 (<span id="so-win">—</span>, 1인 팀 vs 같은 인력사 2인 팀)</h3>
+    <div class="kpis">
+      <div class="kpi"><div class="k">배정 팀·일당 판매</div><div class="v"><span id="so-k1">—</span><span class="u">대</span></div><div class="s">2인 팀 <span id="so-k1b">—</span>대 · 1인은 2인의 <span id="so-k1c">—</span>%</div><div class="ic o"><svg viewBox="0 0 24 24"><path d="M4 17l5-6 4 4 7-8"/><path d="M16 7h4v4"/></svg></div></div>
+      <div class="kpi"><div class="k">인당 판매</div><div class="v"><span id="so-k2">—</span><span class="u">대</span></div><div class="s">2인 팀 인당 <span id="so-k2b">—</span>대 · 1인이 <span id="so-k2c">—</span>% 높음</div><div class="ic g"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></div></div>
+      <div class="kpi"><div class="k">1인 배정 팀·일</div><div class="v"><span id="so-k3">—</span><span class="u">팀·일</span></div><div class="s">전체 배정의 <span id="so-k3b">—</span>% · 1인 팀 <span id="so-k3c">—</span>개</div><div class="ic p"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg></div></div>
+      <div class="kpi"><div class="k">판매 발생 팀·일 비율</div><div class="v"><span id="so-k4">—</span><span class="u">%</span></div><div class="s">2인 팀 <span id="so-k4b">—</span>% · 하루 5대 이상 1인 <span id="so-k4c">—</span>% / 2인 <span id="so-k4d">—</span>%</div><div class="ic b"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></div></div>
+      <div class="kpi"><div class="k">회원가입 (기재 건 기준)</div><div class="v"><span id="so-k5">—</span><span class="u">%</span></div><div class="s">2인 팀 <span id="so-k5b">—</span>% · 기재 비율 1인 <span id="so-k5c">—</span>% / 2인 <span id="so-k5d">—</span>%</div><div class="ic o"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></div></div>
+      <div class="kpi"><div class="k">오후(13시~) 판매 비중</div><div class="v"><span id="so-k6">—</span><span class="u">%</span></div><div class="s">2인 팀 <span id="so-k6b">—</span>% · 마지막 판매 1인 <span id="so-k6c">—</span> / 2인 <span id="so-k6d">—</span></div><div class="ic g"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></div></div>
+    </div>
+    <div class="grid2" style="margin-top:var(--cds-gap-md)">
+      <div class="card"><h3>지표별 비교</h3>
+        <div class="tw"><table data-source="so_main"><thead><tr><th data-field="지표">지표</th><th class="n" data-field="1인">1인 팀</th><th class="n" data-field="2인">2인 팀 (같은 인력사)</th><th class="n" data-field="2인전체">2인 팀 (전체)</th></tr></thead><tbody data-draw="tbl" data-limit="0" data-cols="지표,1인,2인,2인전체" data-fmts=",,,"></tbody></table></div>
+        <p class="note">"배정 팀·일"은 스케줄 탭에 배정된 팀·일(당일 미운영 포함), "판매 발생 팀·일"은 그날 1대 이상 판 팀·일입니다. 같은 인력사 = 1인 팀이 있는 인력사의 2인 팀.</p></div>
+      <div>
+        <div class="card"><h3>같은 인원으로 환산하면</h3>
+          <div class="tw"><table data-source="so_calc"><thead><tr><th data-field="시나리오">시나리오</th><th class="n" data-field="판매">하루 기대 판매</th><th class="n" data-field="인당">인당 판매</th><th class="n" data-field="비율">2인 팀 1개 대비 %</th></tr></thead><tbody data-draw="tbl" data-limit="0" data-cols="시나리오,판매,인당,비율" data-fmts=",.2f,.2f,.1f"></tbody></table></div></div>
+        <div class="card" style="margin-top:var(--cds-gap-md)"><h3>차이의 신뢰 구간 (부트스트랩 95%)</h3>
+          <div class="tw"><table data-source="so_ci"><thead><tr><th data-field="항목">항목</th><th class="n" data-field="일인">1인</th><th class="n" data-field="이인">2인</th><th class="n" data-field="차이">차이</th><th class="n" data-field="하한">하한</th><th class="n" data-field="상한">상한</th></tr></thead><tbody data-draw="tbl" data-limit="0" data-cols="항목,일인,이인,차이,하한,상한" data-fmts=",.2f,.2f,+.2f,+.2f,+.2f"></tbody></table></div>
+          <p class="note">구간이 0을 포함하지 않으면 우연으로 보기 어려운 차이입니다.</p></div>
+      </div>
+    </div>
+    <div class="grid2" style="margin-top:var(--cds-gap-md)">
+      <div class="card"><h3>인력사별</h3>
+        <div class="tw"><table data-source="so_agency"><thead><tr><th data-field="인력사">인력사</th><th data-field="유형">유형</th><th class="n" data-field="배정">배정 팀·일</th><th class="n" data-field="판매발생비율">판매 발생 %</th><th class="n" data-field="배정당판매">팀·일당</th><th class="n" data-field="인당배정">인당</th><th class="n" data-field="오대이상">5대 이상 %</th><th class="n" data-field="회원가입율">회원가입 %</th><th class="n" data-field="MPOS비중">MPOS %</th></tr></thead><tbody data-draw="tbl" data-limit="0" data-cols="인력사,유형,배정,판매발생비율,배정당판매,인당배정,오대이상,회원가입율,MPOS비중" data-fmts=",,,.1f,.2f,.2f,.1f,.1f,.1f"></tbody></table></div>
+        <p class="note">인력사는 팀 번호 범위로 나눴습니다 (후킷 1~30, 토마스 31~68, 비욘드 69~106).</p></div>
+      <div class="card"><h3>배정 팀·일 판매 분포 (%)</h3>
+        <div class="tw"><table data-source="so_dist"><thead><tr><th data-field="판매">하루 판매</th><th class="n" data-field="1인">1인</th><th class="n" data-field="2인">2인</th></tr></thead><tbody data-draw="tbl" data-limit="0" data-cols="판매,1인,2인" data-fmts=",.1f,.1f"></tbody></table></div></div>
+    </div>
+    <div class="grid2" style="margin-top:var(--cds-gap-md)">
+      <div class="card"><h3>주차별 (배정 팀·일당 판매)</h3>
+        <div class="tw"><table data-source="so_week"><thead><tr><th data-field="주차">주차</th><th class="n" data-field="1인배정">1인 배정</th><th class="n" data-field="1인평균">1인 평균</th><th class="n" data-field="2인배정">2인 배정</th><th class="n" data-field="2인평균">2인 평균</th><th class="n" data-field="비율">1인/2인 %</th></tr></thead><tbody data-draw="tbl" data-limit="0" data-cols="주차,1인배정,1인평균,2인배정,2인평균,비율" data-fmts=",,.2f,,.2f,.0f"></tbody></table></div>
+        <p class="note">팀 번호가 없는 첫 주는 판매가 0으로 보입니다.</p></div>
+      <div class="card"><h3>요일별 · 지점별 · 시작점포 (배정 팀·일당 판매)</h3>
+        <div class="tw"><table data-source="so_seg"><thead><tr><th data-field="구분">구분</th><th data-field="항목">항목</th><th class="n" data-field="1인배정">1인 배정</th><th class="n" data-field="1인평균">1인 평균</th><th class="n" data-field="2인배정">2인 배정</th><th class="n" data-field="2인평균">2인 평균</th><th class="n" data-field="2인인당">2인 인당</th></tr></thead><tbody data-draw="tbl" data-limit="0" data-cols="구분,항목,1인배정,1인평균,2인배정,2인평균,2인인당" data-fmts=",,,.2f,,.2f,.2f"></tbody></table></div></div>
+    </div>
+    <div class="card" style="margin-top:var(--cds-gap-md)"><h3>일별 (배정 팀·일당 판매)</h3>
+      <div class="tw"><table data-source="so_day"><thead><tr><th data-field="일자">일자</th><th class="n" data-field="1인배정">1인 배정</th><th class="n" data-field="1인판매">1인 판매</th><th class="n" data-field="1인평균">1인 평균</th><th class="n" data-field="2인배정">2인 배정</th><th class="n" data-field="2인판매">2인 판매</th><th class="n" data-field="2인평균">2인 평균</th></tr></thead><tbody data-draw="tbl" data-cols="일자,1인배정,1인판매,1인평균,2인배정,2인판매,2인평균" data-fmts=",,,.2f,,,.2f"></tbody></table></div></div>
+    <div class="grid2" style="margin-top:var(--cds-gap-md)">
+      <div class="card"><h3>시간대별 판매 (배정 팀·일당, 비중 %)</h3>
+        <div class="tw"><table data-source="so_hour"><thead><tr><th data-field="시">시</th><th class="n" data-field="일인팀일당">1인 팀·일당</th><th class="n" data-field="이인팀일당">2인 팀·일당</th><th class="n" data-field="일인비중">1인 비중 %</th><th class="n" data-field="이인비중">2인 비중 %</th></tr></thead><tbody data-draw="tbl" data-limit="0" data-cols="시,일인팀일당,이인팀일당,일인비중,이인비중" data-fmts=",.3f,.3f,.1f,.1f"></tbody></table></div></div>
+      <div class="card"><h3>판매 구성 비중 (%)</h3>
+        <div class="tw"><table data-source="so_share"><thead><tr><th data-field="구분">구분</th><th data-field="항목">항목</th><th class="n" data-field="일인">1인</th><th class="n" data-field="이인">2인</th></tr></thead><tbody data-draw="tbl" data-limit="0" data-cols="구분,항목,일인,이인" data-fmts=",,.1f,.1f"></tbody></table></div></div>
+    </div>
+    <div class="card" style="margin-top:var(--cds-gap-md)"><h3>팀별 인당 판매 순위 (비교 구간)</h3>
+      <div class="tw"><table data-source="so_rank"><thead><tr><th class="n" data-field="순위">순위</th><th data-field="인력사">인력사</th><th class="n" data-field="팀번호">팀</th><th data-field="유형">유형</th><th class="n" data-field="배정">배정</th><th class="n" data-field="판매발생">판매 발생일</th><th class="n" data-field="평균">팀·일당</th><th class="n" data-field="인당">인당</th></tr></thead><tbody data-draw="tbl" data-cols="순위,인력사,팀번호,유형,배정,판매발생,평균,인당" data-fmts=",,,,,,.2f,.2f"></tbody></table></div></div>
+  </div>
+
   <div class="panel" id="p-feedback" hidden>
     <p class="note" style="margin-bottom:var(--cds-gap-md)">보고용 리포트의 소비자 피드백 탭을 주차별로 그대로 옮긴 것입니다. 연도·월 필터를 따릅니다.</p>
     <div id="fb-list"></div>
@@ -362,6 +413,6 @@
 </div>
 
 <script src="dash.js?v=3"></script>
-<script src="app.js?v=26"></script>
+<script src="app.js?v=27"></script>
 </body>
 </html>

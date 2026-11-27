@@ -359,3 +359,7 @@ try:
     import sampling   # 무료 샘플링 결제 내역 → docs/data/sampling.json
 except Exception as e:
     print("sampling.json 건너뜀:", e)
+try:
+    import solo   # 1인 근무팀 vs 2인 근무팀 비교 → docs/data/solo.json
+except Exception as e:
+    print("solo.json 건너뜀:", e)
