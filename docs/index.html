@@ -261,10 +261,10 @@
       <div class="tw"><table data-source="i_daily"><thead><tr><th data-field="일자">일자</th><th class="n" data-field="전일">시작</th><th class="n" data-field="입고">입고</th><th class="n" data-field="소진">소진</th><th class="n" data-field="마감">마감</th><th class="n" data-field="주간마감">주간</th><th class="n" data-field="야간마감">야간</th><th class="n" data-field="MPOS">MPOS 결제</th><th class="n" data-field="차이">소진−MPOS</th><th class="n" data-field="판매">전체 판매</th><th data-field="비고">비고</th></tr></thead>
       <tbody data-draw="tbl" data-cols="일자,전일,입고,소진,마감,주간마감,야간마감,MPOS,차이,판매,비고" data-fmts=",,,,,,,,+,,,"></tbody></table></div>
       <p class="note">출처는 데일리 리포트 메일의 디바이스 재고 표(10월 8일부터)이며 매일 메일을 받은 뒤 손으로 옮깁니다. 10월 16일·23일은 메일에 표가 없어 앞뒤 마감 재고 차이로 소진을 계산했습니다(추정). 10월 14일 시작 재고는 전날 마감보다 로즈 골드 36대가 적게 적혀 있습니다. 재고 소진은 MPOS 결제 수량과 맞춰 봅니다(판매 데이터 탭에서 경로가 MPOS인 건의 수량 합). 전체 판매는 데일리 리포트 탭의 판매 수로, CVS 쿠폰 판매 등이 더해져 소진보다 많습니다. 11월 20일 입고 0은 주간→야간 이관(−96/+96)이라 합계에 변화가 없습니다.</p></div>
-    <div class="card" style="margin-top:var(--cds-gap-md)"><h3>디바이스 입고 내역 (대)</h3>
-      <div class="tw"><table data-source="i_in"><thead><tr><th data-field="일자">일자</th><th data-field="구분">구분</th><th class="n" data-field="제트 블랙">제트 블랙</th><th class="n" data-field="네이비 블루">네이비 블루</th><th class="n" data-field="로즈 골드">로즈 골드</th><th class="n" data-field="실버">루나 실버</th><th class="n" data-field="합계">합계</th><th data-field="비고">비고</th></tr></thead>
+    <div class="card" style="margin-top:var(--cds-gap-md)"><h3>디바이스 입고 내역 (대, 2026년 3월부터)</h3>
+      <div class="tw"><table data-source="i_in" data-limit="0"><thead><tr><th data-field="일자">일자</th><th data-field="구분">구분</th><th class="n" data-field="제트 블랙">제트 블랙</th><th class="n" data-field="네이비 블루">네이비 블루</th><th class="n" data-field="로즈 골드">로즈 골드</th><th class="n" data-field="실버">루나 실버</th><th class="n" data-field="합계">합계</th><th data-field="비고">비고</th></tr></thead>
       <tbody data-draw="tbl" data-cols="일자,구분,제트 블랙,네이비 블루,로즈 골드,실버,합계,비고" data-fmts=",,,,,,,"></tbody></table></div>
-      <p class="note">9월 30일 입고 2,391대는 9월 마감 재고 4,776대에 이미 들어 있어 위 입고 누계(10월 이후)에는 더하지 않습니다. 10월 21일 야간 프리샘플링용 1,500대는 판매 재고가 아니어서 위 재고 흐름과 입고 누계에는 넣지 않고 내역에만 적습니다. DP(진열용) 반출 220대와 야간 이관은 입고가 아니라 여기 넣지 않습니다.</p></div>
+      <p class="note">3~9월 줄은 "디바이스 입고 현황" 정리 파일(브리드 창고 입고, 진열용 DP 포함) 기준이고, 위 재고 흐름은 10월 1일부터라 입고 누계에는 들어가지 않습니다. 9월 30일 입고 2,391대는 9월 마감 재고 4,776대에 이미 들어 있어 위 입고 누계(10월 이후)에는 더하지 않습니다. 10월 21일 야간 프리샘플링용 1,500대는 판매 재고가 아니어서 위 재고 흐름과 입고 누계에는 넣지 않고 내역에만 적습니다. DP(진열용) 반출 220대와 야간 이관은 입고가 아니라 여기 넣지 않습니다.</p></div>
 
     <h2 style="margin-top:var(--cds-gap-lg)">야간 프리샘플링 (100원 결제)</h2>
     <div class="kpis">
