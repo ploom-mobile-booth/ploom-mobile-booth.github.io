@@ -206,6 +206,8 @@
 
   // ---------- 작년 비교 ----------
   // ---------- 디바이스 재고 (메일의 재고 표, 필터와 무관하게 전 기간) ----------
+  // 재고 관리: 위 연도·월 필터는 날짜별 표·그래프에만 적용한다 (누계·월별 표·최근 잔여는 전 기간)
+  const dayOk = d => (!F.year || String(d).slice(0, 4) === F.year) && (!F.month || String(d).slice(0, 7) === F.month);
   function inventory() {
     mposCheck();
     const I = D.inv || []; if (!I.length) return;
@@ -217,7 +219,7 @@
       const inc = sum(g, r => r.입고), used = sum(g, r => r.소진), close = sum(g, r => r.마감), prev = sum(g, r => r.전일), sales = salesOf.has(d) ? salesOf.get(d) : null, mpos = mposOf.has(d) ? mposOf.get(d) : null;
       const memo = [...new Set(g.map(r => r.비고).filter(Boolean))].join(' · ');
       return { 일자: d, 전일: prev, 입고: inc, 소진: used, 마감: close, 주간마감: sum(dg, r => r.마감), 야간마감: ng.length ? sum(ng, r => r.마감) : null, MPOS: mpos, 판매: sales, 차이: mpos == null ? null : used - mpos, 비고: memo }; });
-    dash.set('i_daily', daily);
+    dash.set('i_daily', daily.filter(r => dayOk(r.일자)));
     const last = daily[daily.length - 1], lastG = I.filter(r => r.일자 === last.일자);
     const usedTot = sum(I, r => r.소진);
     dash.set('i_color', COLORS.map(c => { const dg = lastG.find(r => r.구분 === '주간' && r.색상 === c), ng = lastG.find(r => r.구분 === '야간' && r.색상 === c); const u = sum(I.filter(r => r.색상 === c), r => r.소진); return { 색상: c, 주간: dg ? dg.마감 : 0, 야간: ng ? ng.마감 : 0, 합계: (dg ? dg.마감 : 0) + (ng ? ng.마감 : 0), 소진누계: u, 비중: usedTot ? r1(u / usedTot * 100) : null }; }));
@@ -237,7 +239,7 @@
       const tin = sum(Object.values(inC), v => v), tout = sum(SM, r => r.수량);
       dash.set('sm_sum', [{ 입고: tin, 판매: tout, 잔여: tin - tout, 건수: sum(SM, r => r.건수), 금액: sum(SM, r => r.금액), 일수: SM.length, 취소: sum(SM, r => r.취소), 첫날: SM[0].일자, 끝날: SM[SM.length - 1].일자 }]);
       dash.set('sm_color', COLORS.map(c => ({ 색상: c, 입고: inC[c], 판매: outC[c], 잔여: inC[c] - outC[c] })));
-      let bal = tin; dash.set('sm_daily', SM.map(r => { bal -= r.수량; const o = { 일자: r.일자, 건수: r.건수, 수량: r.수량, 금액: r.금액, 잔여: bal, 취소: r.취소 }; COLORS.forEach(c => o[c] = (r.색상 || {})[c] || 0); return o; }).reverse());
+      let bal = tin; dash.set('sm_daily', SM.map(r => { bal -= r.수량; const o = { 일자: r.일자, 건수: r.건수, 수량: r.수량, 금액: r.금액, 잔여: bal, 취소: r.취소 }; COLORS.forEach(c => o[c] = (r.색상 || {})[c] || 0); return o; }).filter(r => dayOk(r.일자)).reverse());
       const reg = {}; SM.forEach(r => Object.entries(r.지역 || {}).forEach(([k, v]) => reg[k] = (reg[k] || 0) + v));
       dash.set('sm_region', Object.entries(reg).map(([k, v]) => ({ 지역: k, 수량: v, 비중: tout ? r1(v / tout * 100) : null })).sort((a, b) => b.수량 - a.수량));
       const sasof = document.getElementById('sm-asof'); if (sasof) sasof.textContent = SM.map(r => r.일자.slice(5).replace('-', '/')).join(' · ');
@@ -252,7 +254,7 @@
       const p0 = [...pin.keys()].sort()[0] || ''; const pout = new Map(); D.sales.forEach(r => { if (+r.패널 > 0 && r.일자 >= p0) pout.set(r.일자, (pout.get(r.일자) || 0) + +r.패널); });
       const pdays = [...new Set([...pin.keys(), ...pout.keys()])].sort();
       let bal = 0; const prows = pdays.map(d => { const i = pin.get(d) || 0, o = pout.get(d) || 0; bal += i - o; return { 일자: d, 입고: i, 지급: o, 잔여: bal, 지급건수: D.sales.filter(r => r.일자 === d && +r.패널 > 0).length, 비고: [...new Set(P.filter(r => r.일자 === d).map(r => r.비고).filter(Boolean))].join(' · ') }; });
-      dash.set('p_daily', prows.slice().reverse());
+      dash.set('p_daily', prows.filter(r => dayOk(r.일자)).reverse());
       const tin = sum(P, r => r.입고), tout = sum([...pout.values()], v => v);
       dash.set('p_sum', [{ 입고: tin, 지급: tout, 잔여: tin - tout, 입고횟수: new Set(P.map(r => r.일자)).size, 지급일수: pout.size, 마지막지급: pdays.length ? pdays[pdays.length - 1] : null }]);
       const pasof = document.getElementById('p-asof'); if (pasof) pasof.textContent = pdays.length ? pdays[pdays.length - 1].slice(5).replace('-', '/') : '—';
@@ -276,14 +278,14 @@
       const gout = new Map(); D.sales.forEach(r => { if (+r.기프트카드 > 0 && r.일자 >= g0) gout.set(r.일자, (gout.get(r.일자) || 0) + +r.기프트카드); });
       const gdays = [...new Set([...gin.keys(), ...gout.keys()])].sort();
       let gb = 0; const grows = gdays.map(d => { const i = gin.get(d) || 0, o = gout.get(d) || 0; gb += i - o; return { 일자: d, 입고: i, 사용: o, 잔여: gb, 비고: [...new Set(G.filter(r => r.일자 === d).map(r => r.비고).filter(Boolean))].join(' · ') }; });
-      dash.set('g_daily', grows.slice().reverse());
+      dash.set('g_daily', grows.filter(r => dayOk(r.일자)).reverse());
       const gtin = sum(G, r => r.입고), gtout = sum([...gout.values()], v => v);
       dash.set('g_sum', [{ 입고: gtin, 사용: gtout, 잔여: gtin - gtout, 입고횟수: gin.size, 사용일수: gout.size }]);
       const gasof = document.getElementById('g-asof'); if (gasof) gasof.textContent = gdays.length ? gdays[gdays.length - 1].slice(5).replace('-', '/') : '—';
       dash.set('g_month', [...group(grows, r => r.일자.slice(0, 7))].map(([m, g]) => ({ 월: parseInt(m.slice(5)) + '월', 입고: sum(g, r => r.입고), 사용: sum(g, r => r.사용), 월말잔여: g[g.length - 1].잔여 })));
     }
     const asof = document.getElementById('i-asof'); if (asof) asof.textContent = last.일자.slice(5).replace('-', '/'); const asof2 = document.getElementById('i-asof2'); if (asof2) asof2.textContent = last.일자.slice(5).replace('-', '/');
-    dash.set('i_color_daily', [...group(I, r => r.일자 + '|' + r.구분)].map(([k, g]) => { const o = { 일자: g[0].일자, 구분: g[0].구분, 소진: sum(g, r => r.소진), 마감: sum(g, r => r.마감) }; g.forEach(r => o[r.색상] = r.소진); return o; }).sort((a, b) => a.일자 < b.일자 ? 1 : a.일자 > b.일자 ? -1 : a.구분 < b.구분 ? -1 : 1));
+    dash.set('i_color_daily', [...group(I, r => r.일자 + '|' + r.구분)].map(([k, g]) => { const o = { 일자: g[0].일자, 구분: g[0].구분, 소진: sum(g, r => r.소진), 마감: sum(g, r => r.마감) }; g.forEach(r => o[r.색상] = r.소진); return o; }).sort((a, b) => a.일자 < b.일자 ? 1 : a.일자 > b.일자 ? -1 : a.구분 < b.구분 ? -1 : 1).filter(r => dayOk(r.일자)));
   }
 
   // ---------- MPOS 결제 내역 vs 리포트 MPOS 판매 (날짜·색상별, 전 기간) ----------
@@ -304,10 +306,11 @@
     const mrows = [...group(M, r => r.일자.slice(0, 7))].map(([m, g]) => { const o = { 월: parseInt(m.slice(5)) + '월', 합계: sum(g, r => r.수량), 건수: sum(g, r => r.건수) }; MC.forEach(c => o[c] = sum(g, r => (r.색상 || {})[c] || 0)); return o; }).sort((a, b) => parseInt(a.월) - parseInt(b.월));
     const mt = { 월: '합계', 합계: sum(mrows, r => r.합계), 건수: sum(mrows, r => r.건수) }; MC.forEach(c => mt[c] = sum(mrows, r => r[c]));
     const mtot = mt.합계 || 1; MC.forEach(c => mt[c + ' %'] = r1(mt[c] / mtot * 100));
-    dash.set('x_mpos_color_month', mrows.concat([mt]));
+    const mp = { 월: '비중 %', 합계: '100.0', 건수: '' }; MC.forEach(c => mp[c] = r1(mt[c] / mtot * 100).toFixed(1));
+    dash.set('x_mpos_color_month', mrows.concat([mt, mp]));
     dash.set('x_mpos_color_chart', mrows);
     dash.set('x_mpos_color_tot', MC.map(c => ({ 색상: c, 판매: mt[c], 비중: r1(mt[c] / mtot * 100) })));
-    dash.set('x_mpos_daily', rows.slice().reverse());
+    dash.set('x_mpos_daily', rows.filter(r => dayOk(r.일자)).reverse());
     const both = rows.filter(r => r.차이 != null);
     dash.set('x_mpos_sum', [{ 일수: both.length, 일치: both.filter(r => r.차이 === 0 && r.상태 === '일치').length, 수량다름: both.filter(r => r.차이 !== 0).length, 색상만: both.filter(r => r.상태 === '색상만 다름').length, MPOS수량: sum(both, r => r.MPOS수량), 리포트수량: sum(both, r => r.리포트수량), 차이: sum(both, r => r.차이), 취소: sum(rows, r => r.취소), 한쪽만: rows.length - both.length }]);
     dash.set('x_mpos_month', [...group(rows, r => r.월)].map(([m, g]) => { const b = g.filter(r => r.차이 != null); return { 월: parseInt(m.slice(5)) + '월', 일수: b.length, MPOS수량: sum(b, r => r.MPOS수량), 리포트수량: sum(b, r => r.리포트수량), 차이: sum(b, r => r.차이), 수량다름일: b.filter(r => r.차이 !== 0).length, 색상다름일: b.filter(r => r.상태 === '색상만 다름').length, 취소: sum(g, r => r.취소) }; }).sort((a, b) => parseInt(a.월) - parseInt(b.월)));
