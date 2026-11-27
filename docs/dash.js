@@ -69,6 +69,13 @@ const dash = (() => {
       b.textContent = open ? '접기 ▲' : `전체 ${rows.length}줄 보기 ▼ (${rows.length - limit}줄 더)`;
       b.addEventListener('click', () => { tb.dataset.open = open ? '0' : '1'; dash.render(); if (open) table.scrollIntoView({ block: 'start', behavior: 'smooth' }); });
       td.appendChild(b); tr.appendChild(td); tb.appendChild(tr);
+      // 표 제목(h3) 옆에도 같은 버튼을 둔다 (긴 표를 펼친 뒤 위에서 바로 접을 수 있게)
+      const wrap = table.closest('.tw') || table, head = wrap.previousElementSibling && wrap.previousElementSibling.tagName === 'H3' ? wrap.previousElementSibling : null;
+      if (head) {
+        let tbn = head.querySelector('button.fold'); if (!tbn) { tbn = document.createElement('button'); tbn.type = 'button'; tbn.className = 'link fold'; head.appendChild(tbn); }
+        tbn.textContent = open ? '접기 ▲' : `전체 ${rows.length}줄 ▼`;
+        tbn.onclick = () => { tb.dataset.open = open ? '0' : '1'; dash.render(); };
+      }
     }
   });
 
