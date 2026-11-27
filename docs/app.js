@@ -306,7 +306,7 @@
     const mrows = [...group(M, r => r.일자.slice(0, 7))].map(([m, g]) => { const o = { 월: parseInt(m.slice(5)) + '월', 합계: sum(g, r => r.수량), 건수: sum(g, r => r.건수) }; MC.forEach(c => o[c] = sum(g, r => (r.색상 || {})[c] || 0)); return o; }).sort((a, b) => parseInt(a.월) - parseInt(b.월));
     const mt = { 월: '합계', 합계: sum(mrows, r => r.합계), 건수: sum(mrows, r => r.건수) }; MC.forEach(c => mt[c] = sum(mrows, r => r[c]));
     const mtot = mt.합계 || 1; MC.forEach(c => mt[c + ' %'] = r1(mt[c] / mtot * 100));
-    const mp = { 월: '비중 %', 합계: '100.0', 건수: '' }; MC.forEach(c => mp[c] = r1(mt[c] / mtot * 100).toFixed(1));
+    const mp = { 월: '비중 %', 합계: 100, 건수: null }; MC.forEach(c => mp[c] = r1(mt[c] / mtot * 100));
     dash.set('x_mpos_color_month', mrows.concat([mt, mp]));
     dash.set('x_mpos_color_chart', mrows);
     dash.set('x_mpos_color_tot', MC.map(c => ({ 색상: c, 판매: mt[c], 비중: r1(mt[c] / mtot * 100) })));
