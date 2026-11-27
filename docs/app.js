@@ -299,6 +299,14 @@
     const rows = days.map(d => { const m = mm.get(d), r = rep.get(d); const mq = m ? m.수량 : 0, rq = r ? r.수량 : 0;
       const cd = COLORS.map(c => { const a = m ? (m.색상[c] || 0) : 0, b = r ? (r.색상[c] || 0) : 0; return a === b ? null : `${c} ${a - b > 0 ? '+' : ''}${a - b}`; }).filter(Boolean).join(', ');
       return { 일자: d, 월: d.slice(0, 7), MPOS건수: m ? m.건수 : null, MPOS수량: m ? mq : null, 취소: m ? m.취소 : null, 리포트건수: r ? r.건수 : null, 리포트수량: r ? rq : null, 차이: (m && r) ? mq - rq : null, 소진: inv.has(d) ? inv.get(d) : null, 색상차이: cd || (m && r ? '일치' : '한쪽만 있음'), 상태: !m ? '결제 내역 없음' : !r ? '리포트 없음' : (mq === rq ? (cd ? '색상만 다름' : '일치') : '수량 다름') }; });
+    // 월별 × 색상별 MPOS 승인 수량 (전 기간)
+    const MC = ['제트 블랙', '네이비 블루', '로즈 골드', '루나 실버'];
+    const mrows = [...group(M, r => r.일자.slice(0, 7))].map(([m, g]) => { const o = { 월: parseInt(m.slice(5)) + '월', 합계: sum(g, r => r.수량), 건수: sum(g, r => r.건수) }; MC.forEach(c => o[c] = sum(g, r => (r.색상 || {})[c] || 0)); return o; }).sort((a, b) => parseInt(a.월) - parseInt(b.월));
+    const mt = { 월: '합계', 합계: sum(mrows, r => r.합계), 건수: sum(mrows, r => r.건수) }; MC.forEach(c => mt[c] = sum(mrows, r => r[c]));
+    const mtot = mt.합계 || 1; MC.forEach(c => mt[c + ' %'] = r1(mt[c] / mtot * 100));
+    dash.set('x_mpos_color_month', mrows.concat([mt]));
+    dash.set('x_mpos_color_chart', mrows);
+    dash.set('x_mpos_color_tot', MC.map(c => ({ 색상: c, 판매: mt[c], 비중: r1(mt[c] / mtot * 100) })));
     dash.set('x_mpos_daily', rows.slice().reverse());
     const both = rows.filter(r => r.차이 != null);
     dash.set('x_mpos_sum', [{ 일수: both.length, 일치: both.filter(r => r.차이 === 0 && r.상태 === '일치').length, 수량다름: both.filter(r => r.차이 !== 0).length, 색상만: both.filter(r => r.상태 === '색상만 다름').length, MPOS수량: sum(both, r => r.MPOS수량), 리포트수량: sum(both, r => r.리포트수량), 차이: sum(both, r => r.차이), 취소: sum(rows, r => r.취소), 한쪽만: rows.length - both.length }]);
