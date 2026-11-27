@@ -332,6 +332,18 @@
       dash.set(id, keys.map(k => { const va = sum(ga.get(k) || [], r => r.수량), vb = sum(gb.get(k) || [], r => r.수량), pa = pct(va, ta), pb = pct(vb, tb); return { 항목: k, 올해: va, 올해비중: pa, 작년: vb, 작년비중: pb, 차이: (pa != null && pb != null) ? r1(pa - pb) : null }; })); });
   }
 
+  // ---------- 재고 관리 하위 탭 (h2 단위로 절을 나눠 하나씩 본다) ----------
+  function setupSubTabs() {
+    const panel = document.getElementById('p-inventory'); if (!panel || panel.dataset.subs) return; panel.dataset.subs = '1';
+    const kids = [...panel.children]; const groups = [{ name: '디바이스', els: [] }];
+    kids.forEach(el => { if (el.tagName === 'H2') groups.push({ name: el.textContent.replace(/\s*\(.*\)\s*$/, '').trim(), els: [el] }); else groups[groups.length - 1].els.push(el); });
+    const bar = document.createElement('div'); bar.className = 'subtabs'; panel.prepend(bar);
+    groups.forEach((g, i) => { const w = document.createElement('div'); w.className = 'sub'; w.dataset.sub = String(i); g.els.forEach(e => w.appendChild(e)); panel.appendChild(w);
+      const b = document.createElement('button'); b.type = 'button'; b.textContent = g.name; b.dataset.sub = String(i); b.addEventListener('click', () => showSub(i)); bar.appendChild(b); });
+    function showSub(i) { panel.querySelectorAll('.sub').forEach(w => { w.hidden = w.dataset.sub !== String(i); }); bar.querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.sub === String(i))); try { localStorage.setItem('inv-sub', String(i)); } catch (e) {} dash.render(); }
+    let saved = 0; try { saved = +localStorage.getItem('inv-sub') || 0; } catch (e) {} showSub(Math.min(saved, groups.length - 1));
+  }
+
   // ---------- 화면 전환 ----------
   function showPanel() {
     const id = (location.hash || '#overview').slice(1);
@@ -342,5 +354,5 @@
   }
   addEventListener('hashchange', showPanel);
 
-  load().then(() => { buildBar(); apply(); showPanel(); }).catch(e => { console.error(e); $('badge').textContent = '자료를 읽지 못했습니다'; });
+  load().then(() => { buildBar(); apply(); setupSubTabs(); showPanel(); }).catch(e => { console.error(e); $('badge').textContent = '자료를 읽지 못했습니다'; });
 })();
